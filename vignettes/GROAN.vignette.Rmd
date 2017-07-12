@@ -1,0 +1,370 @@
+---
+title: "GROAN: Genomic Regression in Noisy Scenarios"
+author: "Nelson Nazzicari"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{GROAN: Genomic Regression in Noisy Scenarios}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+<!-- 
+PLEASE NOTE
+
+This is a vignette and it's not rebuilt automatically with the package.
+To do so please use the following command:
+
+devtools::build_vignettes()
+
+And *then* rebuild the package, so it updates the doc.
+--> 
+
+```{r, eval=TRUE, include=TRUE, echo=FALSE}
+#just to be sure
+library(GROAN)
+```
+
+GROAN package allows to assess the performances of one or more genomic regressors
+when artificial noise is injected in an existing dataset. It is possible, however, 
+to use GROAN to simply compare the prediction accuracy of different regression 
+models without the injection of extra noise. All tests are perfomed through crossvalidations,
+which is managed transparently by GROAN, with the user required to input the number of folds.
+
+The general workflow is the following:
+
+1. create a __NoisyDataSet object__ containing your data (phenotypes and genotypes) and your choice
+   of noise injector
+2. create a __Workbench object__ describing the test to be operated (number of crossvalidation folds, number of repetitions) and your choice of genomic regressor
+3. (optional) add more regressors to the Workbench
+4. run GROAN
+5. examine results
+
+GROAN package does not directly contain regressors, but leverages those implemented in the following packages:
+
+* [BGLR](https://cran.r-project.org/package=BGLR): Bayesian Generalized Linear Regression (BayesA, BayesB, BayesC, Bayesian Lasso, RKHS, ...)
+* [rrBLUP](https://cran.r-project.org/package=rrBLUP): Ridge Regression and Other Kernels for Genomic Selection
+* [e1071](https://cran.r-project.org/package=e1071): Support Vector Regressors
+* [randomForest](https://cran.r-project.org/package=randomForest): Random Forest Regressor
+
+If you want to test your own regressor or one taken from another package you need to write a wrapper function, as detailed [here](#custom_regressor).
+
+If you want to customize the type of injected noise you need to write a noise injector function,
+as detailed [here](#custom_noise_injector).
+
+## Example data
+In the rest of this document we refer to the PEA dataset to illustrate GROAN functionalities.
+PEA is a dataset of 103 pea lines, genotyped for 647 SNPs coming from genotyping-by-sequencing (GBS). The dataset contains also a single phenotypic trait (grain
+yield, measured in t/ha). The dataset is split in three variables:
+
+```{r, eval=FALSE, include=TRUE, echo=TRUE, results='hide'}
+library(GROAN)
+
+#array of phenotypes
+GROAN.pea.yield
+
+#dataframe of SNP genotypes
+GROAN.pea.SNPs
+
+#dataframe of realized genotypic kinship
+GROAN.pea.kinship
+```
+
+For more details on the data format please refer to the package help.
+For more details on the dataset in general please refer to:
+
+Annicchiarico et al., _GBS-Based Genomic Selection for Pea Grain Yield under Severe Terminal Drought_, The Plant Genome, Volume 10. \doi{doi:10.3835/plantgenome2016.07.0072}
+
+## Create a NoisyDataset
+A NoisyDataset is an object containing an instance of the original (noiseless) dataset and a reference to a noise injector function. It is created using the __createNoisyDataset__ function. If no noise injector function is specified, no noise will be added.
+
+```{r, eval=TRUE, include=TRUE, echo=TRUE}
+
+#creating a NoisyDataset without any extra noise injected
+nds.no_noise = createNoisyDataset(
+  name = 'PEA, no noise',
+  genotypes = GROAN.pea.SNPs, 
+  phenotypes = GROAN.pea.yield
+)
+
+#creating a NoisyDataset adding noise sampled from a normal distribution
+nds.normal_noise = createNoisyDataset(
+  name = 'PEA, normal noise',
+  genotypes = GROAN.pea.SNPs, 
+  phenotypes = GROAN.pea.yield,
+  noiseInjector = noiseInjector.norm,
+  mean = 0,
+  sd = sd(GROAN.pea.yield) * 0.5
+)
+```
+
+The noise is injected _on demand_ each time the function __getNoisyPhenotype__ is invoked:
+
+```{r eval=TRUE, echo=TRUE, fig.align="center", fig.height=5, fig.width=5, include=TRUE}
+#plotting the original phenotypes
+plot(GROAN.pea.yield, pch=20, main = 'True (black) vs. Noisy (red)', xlab = 'Samples', ylab = 'Phenotypes')
+#plotting an instance of the phenotypes with noise injected 
+points(getNoisyPhenotype(nds.normal_noise), col='red')
+```
+
+Noise injectors usually leverage a stochastic mechanism to add noise. Therefore, successive calls to __getNoisyPhenotype__ produce (slighly) different results.
+
+```{r eval=TRUE, include=TRUE, echo=TRUE, , results='hold'}
+#average correlation oscillates around 0.89
+cor(GROAN.pea.yield, getNoisyPhenotype(nds.normal_noise))
+cor(GROAN.pea.yield, getNoisyPhenotype(nds.normal_noise))
+cor(GROAN.pea.yield, getNoisyPhenotype(nds.normal_noise))
+```
+
+Obviously in absence of noise no variability is present.
+
+```{r eval=TRUE, include=TRUE, echo=TRUE}
+#no noise injector ==> the original phenotypes are returned
+all(GROAN.pea.yield == getNoisyPhenotype(nds.no_noise))
+```
+
+### Available Noise Injectors
+The following noise injectors are implemented in GROAN:
+
+Function name         | Effect
+--------------------- | ----------------------------------
+noiseInjector.dummy	  | No effect (used for test purposes)
+noiseInjector.norm	  | Injects normal (gaussian) noise
+noiseInjector.swapper	| Swaps phenotypes between samples
+noiseInjector.unif    | Injects uniform noise
+
+It is possible to extend GROAN functionalities by writing your own
+noise injector, as detailed [here](#custom_noise_injector).
+
+## Create a Workbench
+A Workbench is an object describing both the regressor(s) that will be tested
+and some configuration regarding the test itself. A Workbench object is created using
+the __createWorkbench__ function. The main parameters of interest are:
+
+* the number of fold (as in k-fold crossvalidation). Defaults to 10.
+* the number of repetitions of the whole test. Repetitions are required to ensure numeric stability and to be able to estimate confidence intervals. Defaults to 5.
+* a flag indicating if crossvalidation is to be performed in a stratified manner (that is, 
+mantaining the same proportion of subgroups in training and test sets). Defaults to FALSE.
+* what to save to hard-disk. The default is to save nothing, with the function simply returning the regression performances. GROAN can however save, for each fold of training, the found hyperparameters in a compact table form. Moreover, it is possible to save the actual trained R objects for detailed inspection. 
+* at least one regressor, optionally with its own parameters. The defaults regressor comes from
+[rrBLUP](https://cran.r-project.org/package=rrBLUP) package
+
+In its simplest form, a Workbench can be created using all defaults. So this call:
+
+```{r, eval=TRUE, include=TRUE, echo=TRUE}
+#creating a Workbench with default values 
+wb = createWorkbench()
+```
+
+is equivalent to the following one, where all default parameters are explicitly assigned:
+
+```{r, eval=TRUE, include=TRUE, echo=TRUE}
+#creating a Workbench with default values explicitly assigned 
+wb = createWorkbench(
+  #parameters defining crossvalidation
+  folds = 5, reps = 10, stratified = FALSE, 
+  
+  #parameters defining save-on-hard-disk policy
+  outfolder = NULL, saveHyperParms = FALSE, saveExtraData = FALSE,
+  
+  #a regressor
+  regressor = phenoRegressor.rrBLUP, regressor.name = 'rrBLUP'
+)
+```
+
+Actually, the default _regressor.name_ is "default regressor", but it was changed in the example for clarity.
+
+It is possible to update the Workbench object by adding other regressors using the __addRegressor__ function:
+
+```{r, eval=TRUE, include=TRUE, echo=TRUE}
+#adding a regressor to an existing Workbench
+wb = addRegressor(
+  #the Workbench to be updater
+  wb,
+  #the new regressor
+  regressor = phenoRegressor.BGLR, regressor.name = 'Bayesian Lasso',
+  
+  #regressor-specific parameters
+  type = 'BL'
+)
+```
+
+The previous operation can be repeated as many times as necessary. Just remember to actually
+update the Workbench instance, and to assign sensible names to the regressors (they will be 
+used, later, to investigate the results).
+
+### Available Regressors
+The following regressors are implemented in GROAN:
+
+Function name         | Effect
+--------------------- | ----------------------------------
+phenoRegressor.BGLR   | Regressors from [BGLR](https://cran.r-project.org/package=BGLR) package (Bayes A, B, C, Bayesian Lasso, G-BLUP, RKHS, ...)
+phenoRegressor.dummy  | A dummy function returning random values, for test/development purposes.
+phenoRegressor.RFR    | Random forest regression from package [randomForest](https://cran.r-project.org/package=randomForest) (caution: very slow)
+phenoRegressor.rrBLUP | Regressor from [rrBLUP](https://cran.r-project.org/package=rrBLUP) package, implements SNP blup with ridge-regression-like solution
+phenoRegressor.SVR    | Support Vector Regression from package [e1071](https://cran.r-project.org/package=e1071). It can operate in three modes: a) _no training_ (an existing SVR object is needed), b) _training_ (when hyperparameters are known) and c) _tuning_ (when hyperpareters need to be optimized in a grid search, very slow)
+
+It is possible to extend GROAN functionalities by writing your own
+regressor, as detailed [here]({#custom_regressor})
+
+## Run GROAN, check summary results
+To run GROAN you need a NoisyDataset object and a Workbench object. Once you have them the actual test is executed using the __GROAN.run__ function.
+
+The result is a data frame containing one row per regressor __times__ the number of repetitions. Each row represents a full crossvalidation of one regressor on the dataset. Columns contain measures of correlation between real and predicted phenotypes, measures of error, and execution time. The same data frame can be saved on hard disk by setting parameter __outfolder__ in the Workbench. 
+Details are reported in __GROAN.run__ documentation.
+
+For reporting purposes it is possible to collate together (and filter) several result data frames, as shown here:
+
+```{r, eval=FALSE, include=TRUE, echo=TRUE}
+#executing two GROAN test, same workbench, different data set
+res.no_noise     = GROAN.run(nds.no_noise, wb)
+res.normal_noise = GROAN.run(nds.normal_noise, wb)
+
+#putting the results together for further analysis
+res.total = rbind(res.no_noise, res.normal_noise)
+```
+
+The main tool used for inspecting regression results is the __plotResult__ function, which produces plots. The function leverages the [ggplot2](https://cran.r-project.org/package=ggplot2) package and returns a ggplot object. It is possible to select the performance metrix to be plotted, together with the type of plot.
+
+```{r, eval=FALSE, include=TRUE, echo=TRUE}
+#defaults is a boxplot of Pearson's correlations
+p = plotResult(res.total)
+print(p)
+```
+
+```{r, out.width = "400px", eval=TRUE, include=TRUE, echo=FALSE}
+knitr::include_graphics('plot1.png')
+```
+
+```{r, eval=FALSE, include=TRUE, echo=TRUE}
+#a barplot with 95% confidence interval of Pearson's correlations
+p = plotResult(res.total, plot.type = 'bar_conf95')
+print(p)
+```
+
+```{r, out.width = "400px", eval=TRUE, include=TRUE, echo=FALSE}
+knitr::include_graphics('plot2.png')
+```
+
+```{r, eval=FALSE, include=TRUE, echo=TRUE}
+#a barplot of execution times per fold, in seconds
+p = plotResult(res.total, plot.type = 'bar', variable = 'time')
+print(p)
+```
+
+```{r, out.width = "400px", eval=TRUE, include=TRUE, echo=FALSE}
+knitr::include_graphics('plot3.png')
+```
+
+## Extended results: hypeparameters and extra information
+The data frame returned by __GROAN.run__ contains the basic performance evaluation operated by GROAN. Several extra information can be stored on hard disk for later examination. This is done setting the appropriate policy on data saving when creating the __Workbench__ object. The following options are available:
+
+Mode                   | How                   | What
+---------------------- | --------------------- | ----------------------------------
+Don't save anything	   | outfolder=NULL        | Nothing will be saved on hard disk.
+Save summary	         | outfolder='some/path' | A subfolder will be created in the passed path, named after the run.id, containing an "accuracy.csv" file.
+...and hyperparameters | outfolder='some/path'<br>saveHyperParms=TRUE | Same as above, but save also hyperpameters from regressor tuning in csv format.
+...and extra data      | outfolder='some/path'<br>saveExtraData=TRUE  | Same as above, but save also extra data from regressor tuning in R format.
+
+Hyperparameters are (usually numeric) values tuned during training phase. Not all regressors require hyperparameter tuning, and the exact nature of hyperparameters depends on the regressor.
+
+Extra data are saved using R __save__ function, and can be accessed using the __load__ function. One extra data bundle is save for each regressor _times_ crossvalidation folds _times_ experiment repetitions. Each bundle will usually contain at least the tuned model, but details depend on regressor function.
+
+## Expand GROAN: custom noise injector {#custom_noise_injector}
+If none of the available noise injectors satisfies your needs it is possible to write and use a custom injector in your experiments. This is done in two steps: 1) write the injector 2) include it in a NoisyDataSet object.
+
+Custom injectors need to accept at least one argument called "phenotypes". When GROAN calls the injector this argument will be a numeric array containing the phenotypes that will be used to train the regressor(s). The function is required to return a numeric array of the same size as "phenotypes", 
+with its values added of noise. For the sake of arguments let's suppose we want to investigate the effects of a bias noise acting on a half of the data, as illustrated by the following code:
+
+```{r, eval=FALSE, include=TRUE, echo=TRUE}
+#A noise injector adding a fixed bias to a random subset of about 50% of the data
+my.noiseInjector.bias = function(phenotypes){
+  #an array of random booleans
+  labels = runif(length(phenotypes)) > 0.5
+  
+  #adding the bias (a fixed value of 5)
+  phenotypes[labels] = phenotypes[labels] + 5
+  
+  #returning the original phenotypes with added noise
+  return(phenotypes)
+}
+```
+
+To use the injector we just defined we need to include it in the definition of a __NoisyDataSet__:
+
+```{r, eval=FALSE, include=TRUE, echo=TRUE}
+#A NoisyDataSet that embeds the bias noise
+nds.bias_noise = createNoisyDataset(
+  name = 'PEA, bias noise',
+  genotypes = GROAN.pea.SNPs, 
+  phenotypes = GROAN.pea.yield,
+  noiseInjector = my.noiseInjector.bias   #the function we defined above
+)
+```
+
+It is possible for the noise injector function to have extra arguments other than phenotypes. In the following version of the bias noise injector the amount of bias is an input from the user:
+
+```{r, eval=FALSE, include=TRUE, echo=TRUE}
+#An improved version of the above function, this time the bias is not fixed
+my.noiseInjector.bias2 = function(phenotypes, bias = 5){
+  #an array of random booleans
+  labels = runif(length(phenotypes)) > 0.5
+  
+  #adding the bias (from the function argument)
+  phenotypes[labels] = phenotypes[labels] + bias
+  
+  #returning the original phenotypes with added noise
+  return(phenotypes)
+}
+```
+
+The call to __NoisyDataSet__ can now assign values to the noise injector arguments:
+
+```{r, eval=FALSE, include=TRUE, echo=TRUE}
+#A NoisyDataSet with bias noise function, using the second version of the function
+nds.bias_noise2 = createNoisyDataset(
+  name = 'PEA, bias noise, second function',
+  genotypes = GROAN.pea.SNPs, 
+  phenotypes = GROAN.pea.yield,
+  noiseInjector = my.noiseInjector.bias2,   #the new version
+  bias = 20 #if omitted the default would be used
+)
+```
+
+Please pay attention to avoid naming conflicts between the new regressor arguments and the ones from __createNoisyDataset__. Once the function is defined and embedded in a noisyDataset it is possible to select a regressor and test the effect of the newly defined noise.
+
+## Expand GROAN: custom regressor {#custom_regressor}
+If none of the available regressors satisfies your needs it is possible to write a custom regressor for your experiments. This is done in two steps: 1) write the regressor function 2) include it in a WorkBench object.
+
+Please understand that the regressor will be called in a crossvalidation procedures. It will thus have access to the complete genotypes (SNPs and/or covariances) and covariates, but the phenotype array will
+contain some missing values (NAs). This are the values to be predicted.
+
+Each custom regressor function _needs_ to accept the following input arguments:
+
+* _phenotypes_ : a numeric array (N x 1), missing values are to be predicted.
+* _genotypes_ : genotypes, one row per phenotype (N), one column per marker (M), values in 0/1/2 (for diploids) or 0/1/2/.../ploidy in case of polyploids. Order is such that each row has a corresponding slot in the phenotypes array. Some rows will thus correspond to missing values.
+* _covariances_ : simmetryc square numeric matrix (N x N) of covariances between sample pairs. Order is such that each row and column have a corresponding slot in the phenotypes array. Some rows and columns will thus correspond to missing values.
+* _extraCovariates_ : extra covariates set, one row per phenotype (N), one column per covariate (W). If NULL no extra covariates are to be considered.      
+* ... : zero or more extra parameters can be added to further define the behaviour of the regression algorithm.
+
+Checks on input (type, size) are not required, since these functions are supposed to
+be used in a GROAN experiment, where checks are done when __NoisyDataset__ and __Workbench__ are created.
+Please note that the variables will reflect what is stored in the __NoisyDataSet__ object. The function should return a list with the following fields:                        
+
+* _$predictions_ : a numeric array (N x 1) of phenotypes, with all NAs filled (predicted) 
+* _$hyperparams_ : (optional) named array of hyperparameters selected during training
+* _$extradata_ : (optional) list of whatever extra data/objects are produced during training that could be of interest for later inspection.
+
+The following snippet of code shows the implementation of __phenoRegressor.dummy__ function. The  "predictions" are actually random values, with genotypes, covariances and extra covariates being ignored. It is useful to show the required function signature.
+
+```{r, eval=FALSE, include=TRUE, echo=TRUE}
+phenoRegressor.dummy = function (phenotypes, genotypes, covariances, extraCovariates){
+  #no operation is actually required
+  return(list(
+    predictions = runif(length(phenotypes)), #predictions
+    hyperparams = c(some = 1, params='a'),
+    extradata = 'filler extra data for phenoRegressor.dummy'
+  ))
+}
+```
+
+The function above can be used as _regressor_ argument for both __createWorkbench__ and __addRegressor__ functions.
