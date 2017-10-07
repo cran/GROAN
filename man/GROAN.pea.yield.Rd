@@ -3,7 +3,7 @@
 \docType{data}
 \name{GROAN.pea.yield}
 \alias{GROAN.pea.yield}
-\title{Data - pea phenotypes (yield)}
+\title{[DEPRECATED]}
 \format{A named array with 103 slots.}
 \source{
 Annicchiarico et al., \emph{GBS-Based Genomic Selection
@@ -14,7 +14,7 @@ Volume 10. \doi{doi:10.3835/plantgenome2016.07.0072}
 GROAN.pea.yield
 }
 \description{
-Phenotype dataset, containing data on pea grain yield [t/ha]
-for each pea line.
+This piece of data is deprecated and will be dismissed in next
+release. Please use \link{GROAN.KI} instead.
 }
 \keyword{datasets}

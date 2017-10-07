@@ -14,42 +14,85 @@
 # You should have received a copy of the GNU General Public License
 # along with GROAN  If not, see <http://www.gnu.org/licenses/>.
 
-#' Data - kinship among pea lines
+#' [DEPRECATED]
 #'
-#' A square dataframe containing the realized kinships between
-#' pairs of pea lines. Values were computed following the
-#' \href{http://www.jstor.org/stable/25681325}{Astle & Balding metric}.
-#' Higher values represent a higher degree of genetic similarity between
-#' lines. This metric mainly accounts for additive genetic contributions
-#' (as an alternative to dominant contributions).
+#' This piece of data is deprecated and will be dismissed in next
+#' release. Please use \link{GROAN.KI} instead.
 #'
 #' @format A data frame with 103 rows and 103 variables. Row and
-#' column names are pea lines.
+#' column names are pea KI lines.
 #' @source Annicchiarico et al., \emph{GBS-Based Genomic Selection
 #' for Pea Grain Yield under Severe Terminal Drought}, The Plant Genome,
 #' Volume 10. \doi{doi:10.3835/plantgenome2016.07.0072}
 "GROAN.pea.kinship"
 
-#' Data - pea SNP genotypes
+#' [DEPRECATED]
 #'
-#' SNP genotypes for 103 pea lines. Each line of this data frame represent
-#' a single pea line. Each column a SNP marker. Values can either be 0, 1, or 2,
-#' representing the three possible genotypes (AA, Aa, and aa, respectively).
+#' This piece of data is deprecated and will be dismissed in next
+#' release. Please use \link{GROAN.KI} instead.
 #'
 #' @format A data frame with 103 rows and 647 variables. Each
-#' row represent a pea line, each column a SNP marker
+#' row represent a pea KI line, each column a SNP marker
 #' @source Annicchiarico et al., \emph{GBS-Based Genomic Selection
 #' for Pea Grain Yield under Severe Terminal Drought}, The Plant Genome,
 #' Volume 10. \doi{doi:10.3835/plantgenome2016.07.0072}
 "GROAN.pea.SNPs"
 
-#' Data - pea phenotypes (yield)
+#' [DEPRECATED]
 #'
-#' Phenotype dataset, containing data on pea grain yield [t/ha]
-#' for each pea line.
+#' This piece of data is deprecated and will be dismissed in next
+#' release. Please use \link{GROAN.KI} instead.
 #'
 #' @format A named array with 103 slots.
 #' @source Annicchiarico et al., \emph{GBS-Based Genomic Selection
 #' for Pea Grain Yield under Severe Terminal Drought}, The Plant Genome,
 #' Volume 10. \doi{doi:10.3835/plantgenome2016.07.0072}
 "GROAN.pea.yield"
+
+#' Example data for pea KI lines
+#'
+#' This list contains all data required to run GROAN examples. It refers to a pea experiment
+#' with 103 lines coming from a biparental Kaspa x Isard cross.
+#'
+#' @format A list with the following fields:
+#' \itemize{
+#'  \item{\emph{"GROAN.KI$yield"}}: named array with 103 slots, containing data on grain yield [t/ha]
+#'  \item{\emph{"GROAN.KI$SNPs"}}: data frame with 103 rows and 647 variables. Each row is
+#'  a pea KI line, each column a SNP marker. Values can either be 0, 1, or 2,
+#' representing the three possible genotypes (AA, Aa, and aa, respectively).
+#'  \item{\emph{"GROAN.KI$kinship"}}: square dataframe containing the realized kinships between
+#' all pairs of each of the 103 pea KI lines. Values were computed following the
+#' \href{http://www.jstor.org/stable/25681325}{Astle & Balding metric}.
+#' Higher values represent a higher degree of genetic similarity between
+#' lines. This metric mainly accounts for additive genetic contributions
+#' (as an alternative to dominant contributions).
+#' }
+#'
+#' @source Annicchiarico et al., \emph{GBS-Based Genomic Selection
+#' for Pea Grain Yield under Severe Terminal Drought}, The Plant Genome,
+#' Volume 10. \doi{doi:10.3835/plantgenome2016.07.0072}
+"GROAN.KI"
+
+#' Example data for pea AI lines
+#'
+#' This list contains all data required to run GROAN examples. It refers to a pea experiment
+#' with 105 lines coming from a biparental Attika x Isard cross.
+#'
+#' @format A list with the following fields:
+#' \itemize{
+#'  \item{\emph{"GROAN.AI$yield"}}: named array with 105 slots, containing data on grain yield [t/ha]
+#'  \item{\emph{"GROAN.AI$SNPs"}}: data frame with 105 rows and 647 variables. Each row is
+#'  a pea AI line, each column a SNP marker. Values can either be 0, 1, or 2,
+#' representing the three possible genotypes (AA, Aa, and aa, respectively).
+#'  \item{\emph{"GROAN.AI$kinship"}}: square dataframe containing the realized kinships between
+#' all pairs of each of the 105 pea AI lines. Values were computed following the
+#' \href{http://www.jstor.org/stable/25681325}{Astle & Balding metric}.
+#' Higher values represent a higher degree of genetic similarity between
+#' lines. This metric mainly accounts for additive genetic contributions
+#' (as an alternative to dominant contributions).
+#' }
+#'
+#' @source Annicchiarico et al., \emph{GBS-Based Genomic Selection
+#' for Pea Grain Yield under Severe Terminal Drought}, The Plant Genome,
+#' Volume 10. \doi{doi:10.3835/plantgenome2016.07.0072}
+"GROAN.AI"

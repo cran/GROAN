@@ -64,7 +64,7 @@ plotResult = function (res,
     res = subset(res, strata != 'no_strata')
     res = plyr::ddply(
       res,
-      c("dataset", "samples", "markers", "extra_covariates", "regressor", "repetition", "folds"),
+      c("dataset.train", "dataset.test", "nsamples.train", "nsamples.test", "markers", "extra_covariates", "regressor", "repetition", "folds"),
       function(x){  colMeans(x[,c("time_per_fold", "pearson", "spearman",
                              "cor_success", "rmse", "mae", "coeff_det")], na.rm = TRUE)
       })
@@ -72,15 +72,18 @@ plotResult = function (res,
   if(strata == 'single'){
     #removing no_strata, then adding strata to dataset, so they differentiate
     res = subset(res, strata != 'no_strata')
-    res$dataset = paste(res$dataset, '-', res$strata)
+    res$dataset.test = paste(res$dataset.test, '\nSTRATUM:', res$strata)
   }
+
+  #creating a new column to be used for X
+  res$X = paste(sep='', 'TRAIN: ', res$dataset.train, '\nTEST: ', res$dataset.test)
 
   #creating the base plot
 
   #adding the type
   if (plot.type == 'box'){
     #base plot object plus boxplot
-    p = ggplot2::ggplot(res, ggplot2::aes(x=res$dataset, fill=res$regressor, y=res[,variable])) +
+    p = ggplot2::ggplot(res, ggplot2::aes(x=res$X, fill=res$regressor, y=res[,variable])) +
         ggplot2::geom_boxplot()
   }else{
     #as first step, we compute averages and confidence intervals
@@ -90,7 +93,7 @@ plotResult = function (res,
     dodge = ggplot2::position_dodge(width=0.9)
 
     #building the bar plot
-    p = ggplot2::ggplot(lims, ggplot2::aes(x=lims$dataset, fill=lims$regressor, y=lims$m)) +
+    p = ggplot2::ggplot(lims, ggplot2::aes(x=lims$X, fill=lims$regressor, y=lims$m)) +
       ggplot2::geom_bar(position=dodge, stat="identity") +
       ggplot2::ylab(variable)
 
@@ -100,18 +103,10 @@ plotResult = function (res,
     }
   }
 
-#   lims = getIntervalLimits(res, 'pearson')
-#   dodge <- position_dodge(width=0.9)
-#   ggplot(lims, aes(x=dataset, fill=regressor, y=m)) +
-#     geom_bar(position=dodge, stat="identity") +
-#     geom_errorbar(aes(ymax=ubound, ymin=lbound), position=dodge, width=0.25)
-
-
   #adding better axis and legend labels
   p = p + ggplot2::ylab(variable) +
     ggplot2::xlab('') +
-    ggplot2::guides(fill=ggplot2::guide_legend(title='Model')) +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5))
+    ggplot2::guides(fill=ggplot2::guide_legend(title='Model'))
 
   return(p)
 }
@@ -128,21 +123,21 @@ plotResult = function (res,
 # @param res returned from GROAN.run()
 # @param variable name of the variable to be analized
 #
-# @return a data frame with: 'regressor', 'dataset', 'm', 'lbound', 'ubound'
+# @return a data frame with: 'regressor', 'X', 'm', 'lbound', 'ubound'
 getConfLimits = function(res, variable){
   lims = data.frame()
   #for each combination of datasets and regressors
   for (r in unique(res$regressor)){
-    for(d in unique(res$dataset)){
+    for(d in unique(res$X)){
       #isolating the interesting data
-      tmp = subset(res, res$regressor == r & res$dataset == d)[,variable]
+      tmp = subset(res, res$regressor == r & res$X == d)[,variable]
       #mean and confidence intervals
       tmp.mean = mean(tmp)
       tmp.sd = sd(tmp)
       tmp.e = qnorm(0.975) * tmp.sd / sqrt(length(tmp))
       lims = rbind(lims, data.frame(
         regressor = r,
-        dataset = d,
+        X = d,
         m = tmp.mean,
         lbound = tmp.mean - tmp.e,
         ubound = tmp.mean + tmp.e

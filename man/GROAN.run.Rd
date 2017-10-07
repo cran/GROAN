@@ -4,12 +4,15 @@
 \alias{GROAN.run}
 \title{Compare Genomic Regressors on a Noisy Dataset}
 \usage{
-GROAN.run(nds, wb, run.id = createRunId())
+GROAN.run(nds, wb, nds.test = NULL, run.id = createRunId())
 }
 \arguments{
 \item{nds}{a GROAN.NoisyDataSet object, containing the data (genotypes, phenotypes and so forth) plus a \code{noiseInjector} function}
 
 \item{wb}{a GROAN.Workbench object, containing the regressors to be tested together with the description of the experiment}
+
+\item{nds.test}{either a GROAN.NoisyDataSet or a list of GROAN.NoisyDataSet. The regression model(s) trained
+on \code{nds} will be tested on \code{nds.test}}
 
 \item{run.id}{an alphanumeric string identifying this specific run. If not passed it is generated using \link{createRunId}}
 }
@@ -17,10 +20,15 @@ GROAN.run(nds, wb, run.id = createRunId())
 a \code{GROAN.Result} object
 }
 \description{
-This function runs the experiment described in a \link[=createWorkbench]{GROAN.Workbench} object on
-the data contained in a \link[=createNoisyDataset]{GROAN.NoisyDataSet} object. It returns a \code{GROAN.Result}
-object, which have a \link[=summary.GROAN.Result]{summary} function for quick inspection and can be
-fed to \link{plotResult} for visual comparisons. The experiment statistics are computed via \link{measurePredictionPerformance}.\cr
+This function runs the experiment described in a \link[=createWorkbench]{GROAN.Workbench} object,
+training regressor(s) on the data contained in a \link[=createNoisyDataset]{GROAN.NoisyDataSet} object
+via parameter \code{nds}. The prediction accuracy is estimated either through crossvalidation
+or on separate test dataset supplied via parameter \code{nds.test}.
+It returns a \code{GROAN.Result} object, which have a \link[=summary.GROAN.Result]{summary}
+function for quick inspection and can be fed to \link{plotResult} for visual comparisons.
+In case of crossvalidation the test dataset in the result object will report the \code{[CV]}
+suffix.\cr
+The experiment statistics are computed via \link{measurePredictionPerformance}.\cr
 Each time this function is invoked it will refer to a \code{runId} - an alphanumeric string identifying
 each specific run. The \code{runId} is usually generated internally, but it is possible to pass it if
 the intention is to join results from different runs for analysis purposes.
@@ -33,12 +41,12 @@ vignette('GROAN.vignette', package='GROAN')
 #Minimal example
 #1) creating a noisy dataset with normal noise
 nds = createNoisyDataset(
-  name = 'PEA, normal noise',
-  genotypes = GROAN.pea.SNPs,
-  phenotypes = GROAN.pea.yield,
+  name = 'PEA KI, normal noise',
+  genotypes = GROAN.KI$SNPs,
+  phenotypes = GROAN.KI$yield,
   noiseInjector = noiseInjector.norm,
   mean = 0,
-  sd = sd(GROAN.pea.yield) * 0.5
+  sd = sd(GROAN.KI$yield) * 0.5
 )
 
 #2) creating a GROAN.WorkBench using default regressor and crossvalidation preset

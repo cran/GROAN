@@ -14,46 +14,110 @@
 # You should have received a copy of the GNU General Public License
 # along with GROAN  If not, see <http://www.gnu.org/licenses/>.
 
-# Script to store load and store data in the package
-# # DATA LOADING ------------------------------------------------------------
-# #phenotypes
-# phenos = read.csv('~/research/GROAN.extra/GROAN.pea/data/to_packet/phenos.csv',
-#                             stringsAsFactors = FALSE, row.names = 1)
-#
-# GROAN.pea.yield = phenos$grain_yield
-# names(GROAN.pea.yield) = rownames(phenos)
-#
-# #genotypes
-# GROAN.pea.SNPs = read.csv('~/research/GROAN.extra/GROAN.pea/data/to_packet/genos.csv',
-#                           stringsAsFactors = FALSE, row.names = 1)
-# #kinship
-# GROAN.pea.kinship = read.csv('~/research/GROAN.extra/GROAN.pea/data/to_packet/kinship.AB.csv',
-#                           stringsAsFactors = FALSE, row.names = 1)
+# Script to load and store data in the package
 
-# # DATA SHUFFLE AND ANONYMIZATION ------------------------------------------
-# samples = names(GROAN.pea.yield)
-# samples.shuff = sample(samples)
+# # DATA LOADING KI ---------------------------------------------------------
+# #phenotypes
+# GROAN.pea.KI.yield = read.csv('~/research/GROAN.extra/GROAN.pea/data/to_packet/phenos.KI.csv',
+#                               stringsAsFactors = FALSE, row.names = 1)
+# #genotypes
+# GROAN.pea.KI.SNPs = read.csv('~/research/GROAN.extra/GROAN.pea/data/to_packet/genos.KI.csv',
+#                              stringsAsFactors = FALSE, row.names = 1)
+# #kinship
+# GROAN.pea.KI.kinship = read.csv('~/research/GROAN.extra/GROAN.pea/data/to_packet/kinship.AB.KI.csv',
+#                                 stringsAsFactors = FALSE, row.names = 1)
 #
-# GROAN.pea.yield = GROAN.pea.yield[samples.shuff]
-# GROAN.pea.kinship = GROAN.pea.kinship[samples.shuff, samples.shuff]
-# GROAN.pea.SNPs = GROAN.pea.SNPs[samples.shuff,]
+# # DATA LOADING AI ---------------------------------------------------------
+# #phenotypes
+# GROAN.pea.AI.yield = read.csv('~/research/GROAN.extra/GROAN.pea/data/to_packet/phenos.AI.csv',
+#                               stringsAsFactors = FALSE, row.names = 1)
+# #genotypes
+# GROAN.pea.AI.SNPs = read.csv('~/research/GROAN.extra/GROAN.pea/data/to_packet/genos.AI.csv',
+#                              stringsAsFactors = FALSE, row.names = 1)
+# #kinship
+# GROAN.pea.AI.kinship = read.csv('~/research/GROAN.extra/GROAN.pea/data/to_packet/kinship.AB.AI.csv',
+#                                 stringsAsFactors = FALSE, row.names = 1)
 #
-# plot(GROAN.pea.yield)
+# # DATA SHUFFLE AND ANONYMIZATION KI ---------------------------------------
+# samples.KI.shuff = sample(rownames(GROAN.pea.KI.yield))
+# GROAN.pea.KI.yield = data.frame(
+#   row.names = samples.KI.shuff,
+#   grain_yield = GROAN.pea.KI.yield[samples.KI.shuff,]
+# )
+# GROAN.pea.KI.kinship = GROAN.pea.KI.kinship[samples.KI.shuff, samples.KI.shuff]
+# GROAN.pea.KI.SNPs = GROAN.pea.KI.SNPs[samples.KI.shuff,]
 #
 # #new names, anonymizing everything
-# samples.anon = paste(sep='_', 'sample', 1:length(GROAN.pea.yield))
-# SNPs.anon = paste(sep='_', 'SNP', 1:ncol(GROAN.pea.SNPs))
+# samples.KI.anon = paste(sep='_', 'sample', 1:nrow(GROAN.pea.KI.yield))
+# SNPs.KI.anon = paste(sep='_', 'SNP', 1:ncol(GROAN.pea.KI.SNPs))
 #
-# names(GROAN.pea.yield) = samples.anon
-# rownames(GROAN.pea.kinship) = samples.anon
-# colnames(GROAN.pea.kinship) = samples.anon
-# rownames(GROAN.pea.SNPs) = samples.anon
-# colnames(GROAN.pea.SNPs) = SNPs.anon
-
+# rownames(GROAN.pea.KI.yield) = samples.KI.anon
+# rownames(GROAN.pea.KI.kinship) = samples.KI.anon
+# colnames(GROAN.pea.KI.kinship) = samples.KI.anon
+# rownames(GROAN.pea.KI.SNPs) = samples.KI.anon
+# colnames(GROAN.pea.KI.SNPs) = SNPs.KI.anon
+#
+# # DATA SHUFFLE AND ANONYMIZATION AI ---------------------------------------
+# samples.AI.shuff = sample(rownames(GROAN.pea.AI.yield))
+# GROAN.pea.AI.yield = data.frame(
+#   row.names = samples.AI.shuff,
+#   grain_yield = GROAN.pea.AI.yield[samples.AI.shuff,]
+# )
+# GROAN.pea.AI.kinship = GROAN.pea.AI.kinship[samples.AI.shuff, samples.AI.shuff]
+# GROAN.pea.AI.SNPs = GROAN.pea.AI.SNPs[samples.AI.shuff,]
+#
+# #new names, anonymizing everything
+# samples.AI.anon = paste(sep='_', 'sample', 1:nrow(GROAN.pea.AI.yield))
+# SNPs.AI.anon = paste(sep='_', 'SNP', 1:ncol(GROAN.pea.AI.SNPs))
+#
+# rownames(GROAN.pea.AI.yield) = samples.AI.anon
+# rownames(GROAN.pea.AI.kinship) = samples.AI.anon
+# colnames(GROAN.pea.AI.kinship) = samples.AI.anon
+# rownames(GROAN.pea.AI.SNPs) = samples.AI.anon
+# colnames(GROAN.pea.AI.SNPs) = SNPs.AI.anon
+#
 # # STORING INTO PACKAGE ----------------------------------------------------
-# devtools::use_data(GROAN.pea.yield, GROAN.pea.SNPs, GROAN.pea.kinship)
+# #for compatibility, KI appears twice, as several split variables and as single list
+# GROAN.pea.yield = GROAN.pea.KI.yield$grain_yield
+# names(GROAN.pea.yield) = rownames(GROAN.pea.KI.yield$grain_yield)
+# GROAN.pea.SNPs = GROAN.pea.KI.SNPs
+# GROAN.pea.kinship = GROAN.pea.KI.kinship
 #
-# dim(GROAN.pea.kinship)
-# dim(GROAN.pea.SNPs)
-# length(GROAN.pea.yield)
-# hist(GROAN.pea.yield)
+# GROAN.KI = list(
+#   SNPs = GROAN.pea.KI.SNPs,
+#   yield = GROAN.pea.KI.yield$grain_yield,
+#   kinship = GROAN.pea.KI.kinship
+# )
+# names(GROAN.KI$yield) = rownames(GROAN.pea.KI.yield$grain_yield)
+#
+# GROAN.AI = list(
+#   SNPs = GROAN.pea.AI.SNPs,
+#   yield = GROAN.pea.AI.yield$grain_yield,
+#   kinship = GROAN.pea.AI.kinship
+# )
+# names(GROAN.AI$yield) = rownames(GROAN.pea.AI.yield$grain_yield)
+#
+# # remember to move to GROAN root
+# devtools::use_data(GROAN.pea.yield, GROAN.pea.SNPs, GROAN.pea.kinship, GROAN.AI, GROAN.KI, overwrite = TRUE)
+#
+# # TEST WITH GROAN ---------------------------------------------------------
+# if(TRUE){
+#   library(GROAN)
+#
+#   nds.KI.split = createNoisyDataset(name = 'KI split',
+#                               genotypes = GROAN.pea.SNPs,
+#                               phenotypes = GROAN.pea.yield)
+#   nds.KI.list = createNoisyDataset(name = 'KI list',
+#                                    genotypes = GROAN.KI$SNPs,
+#                                    phenotypes = GROAN.KI$yield)
+#   nds.AI.list = createNoisyDataset(name = 'AI list',
+#                                    genotypes = GROAN.AI$SNPs,
+#                                    phenotypes = GROAN.AI$yield)
+#   wb = createWorkbench(reps = 30)
+#
+#   res = GROAN.run(nds.KI.split, wb)
+#   res = rbind(res, GROAN.run(nds.KI.list, wb))
+#   res = rbind(res, GROAN.run(nds.AI.list, wb))
+#
+#   plotResult(res)
+# }

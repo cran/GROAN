@@ -2,9 +2,11 @@
 
 S3method(print,GROAN.NoisyDataset)
 S3method(print,GROAN.Workbench)
+S3method(summary,GROAN.NoisyDataset)
 S3method(summary,GROAN.Result)
 export(GROAN.run)
 export(addRegressor)
+export(are.compatible)
 export(createNoisyDataset)
 export(createRunId)
 export(createWorkbench)

@@ -119,28 +119,28 @@ phenoRegressor.dummy = function (phenotypes, genotypes, covariances, extraCovari
 #' @export
 #' @examples
 #' \dontrun{
-#' #using the GROAN.pea dataset, we regress on the dataset and predict the first ten phenotypes
-#' phenos = GROAN.pea.yield
+#' #using the GROAN.KI dataset, we regress on the dataset and predict the first ten phenotypes
+#' phenos = GROAN.KI$yield
 #' phenos[1:10]  = NA
 #'
 #' #calling the regressor with Bayesian Lasso
 #' results = phenoRegressor.BGLR(
 #'   phenotypes = phenos,
-#'   genotypes = GROAN.pea.SNPs,
+#'   genotypes = GROAN.KI$SNPs,
 #'   covariances = NULL,
 #'   extraCovariates = NULL,
 #'   type = 'BL', nIter = 2000 #BGLR-specific parameters
 #' )
 #'
 #' #examining the predictions
-#' plot(GROAN.pea.yield, results$predictions,
+#' plot(GROAN.KI$yield, results$predictions,
 #'      main = 'Train set (black) and test set (red) regressions',
 #'      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
-#' points(GROAN.pea.yield[1:10], results$predictions[1:10], pch=16, col='red')
+#' points(GROAN.KI$yield[1:10], results$predictions[1:10], pch=16, col='red')
 #'
 #' #printing correlations
-#' test.set.correlation  = cor(GROAN.pea.yield[1:10], results$predictions[1:10])
-#' train.set.correlation = cor(GROAN.pea.yield[-(1:10)], results$predictions[-(1:10)])
+#' test.set.correlation  = cor(GROAN.KI$yield[1:10], results$predictions[1:10])
+#' train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results$predictions[-(1:10)])
 #' writeLines(paste(
 #'   'test-set correlation :', test.set.correlation,
 #'   '\ntrain-set correlation:', train.set.correlation
@@ -239,28 +239,28 @@ phenoRegressor.BGLR = function (phenotypes, genotypes, covariances, extraCovaria
 #' @export
 #' @examples
 #' \dontrun{
-#' #using the GROAN.pea dataset, we regress on the dataset and predict the first ten phenotypes
-#' phenos = GROAN.pea.yield
+#' #using the GROAN.KI dataset, we regress on the dataset and predict the first ten phenotypes
+#' phenos = GROAN.KI$yield
 #' phenos[1:10]  = NA
 #'
 #' #calling the regressor with ridge regression BLUP on SNPs
 #' results = phenoRegressor.rrBLUP(
 #'   phenotypes = phenos,
-#'   genotypes = GROAN.pea.SNPs,
+#'   genotypes = GROAN.KI$SNPs,
 #'   covariances = NULL,
 #'   extraCovariates = NULL,
 #'   SE = TRUE, return.Hinv = TRUE #rrBLUP-specific parameters
 #' )
 #'
 #' #examining the predictions
-#' plot(GROAN.pea.yield, results$predictions,
+#' plot(GROAN.KI$yield, results$predictions,
 #'      main = 'Train set (black) and test set (red) regressions',
 #'      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
-#' points(GROAN.pea.yield[1:10], results$predictions[1:10], pch=16, col='red')
+#' points(GROAN.KI$yield[1:10], results$predictions[1:10], pch=16, col='red')
 #'
 #' #printing correlations
-#' test.set.correlation  = cor(GROAN.pea.yield[1:10], results$predictions[1:10])
-#' train.set.correlation = cor(GROAN.pea.yield[-(1:10)], results$predictions[-(1:10)])
+#' test.set.correlation  = cor(GROAN.KI$yield[1:10], results$predictions[1:10])
+#' train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results$predictions[-(1:10)])
 #' writeLines(paste(
 #'   'test-set correlation :', test.set.correlation,
 #'   '\ntrain-set correlation:', train.set.correlation
@@ -323,7 +323,7 @@ phenoRegressor.rrBLUP.SNP = function (phenotypes, genotypes, extraCovariates = N
   }
 
   #predicting test set
-  preds = fi + (as.matrix(genotypes) %*% m$u)[,1]
+  preds = as.vector(fi) + (as.matrix(genotypes) %*% m$u)[,1]
 
   #creating the result list
   return(list(
@@ -469,15 +469,15 @@ phenoRegressor.rrBLUP.G = function (phenotypes, covariances, extraCovariates = N
 #' #The 'tuning' part of the example can take quite some time to run,
 #' #depending on the computational power.
 #'
-#' #using the GROAN.pea dataset, we regress on the dataset and predict the first ten phenotypes
-#' phenos = GROAN.pea.yield
+#' #using the GROAN.KI dataset, we regress on the dataset and predict the first ten phenotypes
+#' phenos = GROAN.KI$yield
 #' phenos[1:10] = NA
 #'
 #' #--------- TUNE ---------
 #' #tuning the SVR on a grid of hyperparameters
 #' results.tune = phenoRegressor.SVR(
 #'   phenotypes = phenos,
-#'   genotypes = GROAN.pea.SNPs,
+#'   genotypes = GROAN.KI$SNPs,
 #'   covariances = NULL,
 #'   extraCovariates = NULL,
 #'   mode = 'tune',
@@ -485,14 +485,14 @@ phenoRegressor.rrBLUP.G = function (phenotypes, covariances, extraCovariates = N
 #' )
 #'
 #' #examining the predictions
-#' plot(GROAN.pea.yield, results.tune$predictions,
+#' plot(GROAN.KI$yield, results.tune$predictions,
 #'      main = 'Mode = TUNING\nTrain set (black) and test set (red) regressions',
 #'      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
-#' points(GROAN.pea.yield[1:10], results.tune$predictions[1:10], pch=16, col='red')
+#' points(GROAN.KI$yield[1:10], results.tune$predictions[1:10], pch=16, col='red')
 #'
 #' #printing correlations
-#' test.set.correlation  = cor(GROAN.pea.yield[1:10], results.tune$predictions[1:10])
-#' train.set.correlation = cor(GROAN.pea.yield[-(1:10)], results.tune$predictions[-(1:10)])
+#' test.set.correlation  = cor(GROAN.KI$yield[1:10], results.tune$predictions[1:10])
+#' train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results.tune$predictions[-(1:10)])
 #' writeLines(paste(
 #'   'test-set correlation :', test.set.correlation,
 #'   '\ntrain-set correlation:', train.set.correlation
@@ -502,7 +502,7 @@ phenoRegressor.rrBLUP.G = function (phenotypes, covariances, extraCovariates = N
 #' #training the SVR, hyperparameters are given
 #' results.train = phenoRegressor.SVR(
 #'   phenotypes = phenos,
-#'   genotypes = GROAN.pea.SNPs,
+#'   genotypes = GROAN.KI$SNPs,
 #'   covariances = NULL,
 #'   extraCovariates = NULL,
 #'   mode = 'train',
@@ -510,14 +510,14 @@ phenoRegressor.rrBLUP.G = function (phenotypes, covariances, extraCovariates = N
 #' )
 #'
 #' #examining the predictions
-#' plot(GROAN.pea.yield, results.train$predictions,
+#' plot(GROAN.KI$yield, results.train$predictions,
 #'      main = 'Mode = TRAIN\nTrain set (black) and test set (red) regressions',
 #'      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
-#' points(GROAN.pea.yield[1:10], results.train$predictions[1:10], pch=16, col='red')
+#' points(GROAN.KI$yield[1:10], results.train$predictions[1:10], pch=16, col='red')
 #'
 #' #printing correlations
-#' test.set.correlation  = cor(GROAN.pea.yield[1:10], results.train$predictions[1:10])
-#' train.set.correlation = cor(GROAN.pea.yield[-(1:10)], results.train$predictions[-(1:10)])
+#' test.set.correlation  = cor(GROAN.KI$yield[1:10], results.train$predictions[1:10])
+#' train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results.train$predictions[-(1:10)])
 #' writeLines(paste(
 #'   'test-set correlation :', test.set.correlation,
 #'   '\ntrain-set correlation:', train.set.correlation
@@ -527,7 +527,7 @@ phenoRegressor.rrBLUP.G = function (phenotypes, covariances, extraCovariates = N
 #' #we recover the trained model from previous run, predictions will be exactly the same
 #' results.run = phenoRegressor.SVR(
 #'   phenotypes = phenos,
-#'   genotypes = GROAN.pea.SNPs,
+#'   genotypes = GROAN.KI$SNPs,
 #'   covariances = NULL,
 #'   extraCovariates = NULL,
 #'   mode = 'run',
@@ -535,14 +535,14 @@ phenoRegressor.rrBLUP.G = function (phenotypes, covariances, extraCovariates = N
 #' )
 #'
 #' #examining the predictions
-#' plot(GROAN.pea.yield, results.run$predictions,
+#' plot(GROAN.KI$yield, results.run$predictions,
 #'      main = 'Mode = RUN\nTrain set (black) and test set (red) regressions',
 #'      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
-#' points(GROAN.pea.yield[1:10], results.run$predictions[1:10], pch=16, col='red')
+#' points(GROAN.KI$yield[1:10], results.run$predictions[1:10], pch=16, col='red')
 #'
 #' #printing correlations
-#' test.set.correlation  = cor(GROAN.pea.yield[1:10], results.run$predictions[1:10])
-#' train.set.correlation = cor(GROAN.pea.yield[-(1:10)], results.run$predictions[-(1:10)])
+#' test.set.correlation  = cor(GROAN.KI$yield[1:10], results.run$predictions[1:10])
+#' train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results.run$predictions[-(1:10)])
 #' writeLines(paste(
 #'   'test-set correlation :', test.set.correlation,
 #'   '\ntrain-set correlation:', train.set.correlation
@@ -681,14 +681,14 @@ phenoRegressor.SVR = function (phenotypes, genotypes, covariances, extraCovariat
 #' @export
 #' @examples
 #' \dontrun{
-#' #using the GROAN.pea dataset, we regress on the dataset and predict the first ten phenotypes
-#' phenos = GROAN.pea.yield
+#' #using the GROAN.KI dataset, we regress on the dataset and predict the first ten phenotypes
+#' phenos = GROAN.KI$yield
 #' phenos[1:10]  = NA
 #'
 #' #calling the regressor with random forest
 #' results = phenoRegressor.RFR(
 #'   phenotypes = phenos,
-#'   genotypes = GROAN.pea.SNPs,
+#'   genotypes = GROAN.KI$SNPs,
 #'   covariances = NULL,
 #'   extraCovariates = NULL,
 #'   ntree = 20,
@@ -696,14 +696,14 @@ phenoRegressor.SVR = function (phenotypes, genotypes, covariances, extraCovariat
 #' )
 #'
 #' #examining the predictions
-#' plot(GROAN.pea.yield, results$predictions,
+#' plot(GROAN.KI$yield, results$predictions,
 #'      main = 'Train set (black) and test set (red) regressions',
 #'      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
-#' points(GROAN.pea.yield[1:10], results$predictions[1:10], pch=16, col='red')
+#' points(GROAN.KI$yield[1:10], results$predictions[1:10], pch=16, col='red')
 #'
 #' #printing correlations
-#' test.set.correlation  = cor(GROAN.pea.yield[1:10], results$predictions[1:10])
-#' train.set.correlation = cor(GROAN.pea.yield[-(1:10)], results$predictions[-(1:10)])
+#' test.set.correlation  = cor(GROAN.KI$yield[1:10], results$predictions[1:10])
+#' train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results$predictions[-(1:10)])
 #' writeLines(paste(
 #'   'test-set correlation :', test.set.correlation,
 #'   '\ntrain-set correlation:', train.set.correlation

@@ -14,6 +14,8 @@ a boolean
 }
 \description{
 Returns TRUE if the passed x variable is a length one variable
-containing a valid TRUE/FALSE value.
+containing a valid TRUE/FALSE value. This test is stricter than
+function \code{is.logical}, since NA, NULL and NaN all return FALSE.
+Moreover, only single cell (lenght one) array admitted.
 }
 \keyword{internal}

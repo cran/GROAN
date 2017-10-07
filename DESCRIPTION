@@ -1,8 +1,8 @@
 Package: GROAN
 Type: Package
 Title: Genomic Regression Workbench
-Version: 1.0.0
-Date: 2017-07-12
+Version: 1.1.0
+Date: 2017-10-07
 Author: Nelson Nazzicari & Filippo Biscarini
 Maintainer: Nelson Nazzicari <nelson.nazzicari@crea.gov.it>
 Description: Workbench for testing genomic regression accuracy on (optionally noisy) phenotypes.
@@ -10,10 +10,10 @@ License: GPL-3 | file LICENSE
 LazyData: TRUE
 RoxygenNote: 6.0.1
 Depends: R (>= 2.10)
-Imports: plyr, rmarkdown, rrBLUP
+Imports: plyr, rrBLUP
 Suggests: BGLR, e1071, ggplot2, knitr, randomForest
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2017-07-12 13:50:47 UTC; nelson
+Packaged: 2017-10-07 13:57:02 UTC; nelson
 Repository: CRAN
-Date/Publication: 2017-07-12 19:30:16 UTC
+Date/Publication: 2017-10-07 14:30:43 UTC

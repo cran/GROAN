@@ -2,7 +2,7 @@
 GROAN
 =====
 
-GROAN provides a workbench to compare the performances of different genomic regression models. GROAN also allows to study the effect of different kinds of noise on the regression accuracies. You have to input your data (phenotypes, genotypes/covariances, other covariates...), select your regressor(s) and optionally your noise injector. GROAN is crossvalidation-oriented (but masks all the related gritty details). Output is produced in numeric form and, if package ggplot2 is installed, as plots. A small working dataset (GROAN.pea) is included and documented.
+GROAN provides a workbench to compare the performances of different genomic regression models. GROAN also allows to study the effect of different kinds of noise on the regression accuracies. You have to input your data (phenotypes, genotypes/covariances, other covariates...), select your regressor(s) and optionally your noise injector. GROAN is crossvalidation-oriented (but masks all the related gritty details). Output is produced in numeric form and, if package ggplot2 is installed, as plots. Two small working datasets (GROAN.KI and GROAN.AI) are included and documented.
 
 Installation
 ------------
@@ -23,11 +23,11 @@ Please see the package vignette for a complete tutorial. What follow is a minima
 #1) creating a noisy dataset with normal noise
 nds = createNoisyDataset(
   name = 'PEA, normal noise',
-  genotypes = GROAN.pea.SNPs,
-  phenotypes = GROAN.pea.yield,
+  genotypes = GROAN.KI$SNPs,
+  phenotypes = GROAN.KI$yield,
   noiseInjector = noiseInjector.norm,
   mean = 0,
-  sd = sd(GROAN.pea.yield) * 0.5
+  sd = sd(GROAN.KI$yield) * 0.5
 )
 
 #2) creating a GROAN.WorkBench using default regressor and crossvalidation preset

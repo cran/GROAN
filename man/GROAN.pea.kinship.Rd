@@ -3,9 +3,9 @@
 \docType{data}
 \name{GROAN.pea.kinship}
 \alias{GROAN.pea.kinship}
-\title{Data - kinship among pea lines}
+\title{[DEPRECATED]}
 \format{A data frame with 103 rows and 103 variables. Row and
-column names are pea lines.}
+column names are pea KI lines.}
 \source{
 Annicchiarico et al., \emph{GBS-Based Genomic Selection
 for Pea Grain Yield under Severe Terminal Drought}, The Plant Genome,
@@ -15,11 +15,7 @@ Volume 10. \doi{doi:10.3835/plantgenome2016.07.0072}
 GROAN.pea.kinship
 }
 \description{
-A square dataframe containing the realized kinships between
-pairs of pea lines. Values were computed following the
-\href{http://www.jstor.org/stable/25681325}{Astle & Balding metric}.
-Higher values represent a higher degree of genetic similarity between
-lines. This metric mainly accounts for additive genetic contributions
-(as an alternative to dominant contributions).
+This piece of data is deprecated and will be dismissed in next
+release. Please use \link{GROAN.KI} instead.
 }
 \keyword{datasets}

@@ -60,7 +60,9 @@ is.string = function(x){
 #' Is a boolean?
 #'
 #' Returns TRUE if the passed x variable is a length one variable
-#' containing a valid TRUE/FALSE value.
+#' containing a valid TRUE/FALSE value. This test is stricter than
+#' function \code{is.logical}, since NA, NULL and NaN all return FALSE.
+#' Moreover, only single cell (lenght one) array admitted.
 #'
 #' @param x the variable to be checked
 #'
@@ -68,11 +70,15 @@ is.string = function(x){
 #'
 #' @return a boolean
 is.boolean = function(x){
+  if(!is.logical(x)) {
+    return (FALSE)
+  }
+
   if (length(x) > 1){
     return (FALSE)
   }
 
-  return (x == TRUE | x == FALSE)
+  return (any(x == TRUE | x == FALSE))
 }
 
 #create a temporary directory. Arguments are passed to tempfile()

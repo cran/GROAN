@@ -10,14 +10,21 @@ createWorkbench(folds = 10, reps = 5, stratified = FALSE,
   ...)
 }
 \arguments{
-\item{folds}{defaults to 10, as in 10-folds crossvalidation}
+\item{folds}{number of folds for crossvalidation, defaults to 10. If \code{NULL} no crossvalidation happens and
+all training data will be used. In this case a second dataset, for test, is neede (see \link{GROAN.run}
+for details)}
 
 \item{reps}{number of times the whole test must be repeated, defaults to 5}
 
-\item{stratified}{boolean indicating whether the crossvalidation should be standard (the default)
-or stratified (keeping the same proportion of data strata in each fold). If no
-strata are present in the \link[=createNoisyDataset]{GROAN.NoisyDataSet} object and
-\code{stratified==TRUE} all samples will be considered belonging to the same strata ("dummyStrata")}
+\item{stratified}{boolean indicating whether GROAN should take into account data strata. This have two
+effects. First, the crossvalidation becomes stratified, meaning that folds will be
+split so that training and test sets will contain the same proportions of each data stratum.
+Second, prediction accuracy will be assessed (also) by strata.
+If no strata are present in the \link[=createNoisyDataset]{GROAN.NoisyDataSet}
+object and \code{stratified==TRUE} all samples will be considered belonging to the
+same strata ("dummyStrata").
+If \code{stratified} is FALSE (the default) GROAN will simply ignore the
+strata, even if present in the \link[=createNoisyDataset]{GROAN.NoisyDataSet}.}
 
 \item{outfolder}{folder where to save the data. If \code{NULL} (the default)
 nothing will be saved. Filenames are standardized. If existing,
@@ -42,7 +49,7 @@ An instance of GROAN.Workbench
 \description{
 This function creates a GROAN.Workbench instance (or fails trying). The created object contains:\cr
 a) one regressor with its own specific configuration\cr
-b) the crossvalidation parameters, describing the experiment.\cr
+b) the experiment parameters (number of repetitions, number of folds in case of crossvalidation, stratification...)\cr
 You can have a general description of the created object using the overridden \link{print.GROAN.Workbench}
 function.\cr
 It is possible to add other regressors to the created \code{GROAN.Workbench} object using \link{addRegressor}.

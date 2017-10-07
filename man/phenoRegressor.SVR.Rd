@@ -88,15 +88,15 @@ specific experiment.\cr
 #The 'tuning' part of the example can take quite some time to run,
 #depending on the computational power.
 
-#using the GROAN.pea dataset, we regress on the dataset and predict the first ten phenotypes
-phenos = GROAN.pea.yield
+#using the GROAN.KI dataset, we regress on the dataset and predict the first ten phenotypes
+phenos = GROAN.KI$yield
 phenos[1:10] = NA
 
 #--------- TUNE ---------
 #tuning the SVR on a grid of hyperparameters
 results.tune = phenoRegressor.SVR(
   phenotypes = phenos,
-  genotypes = GROAN.pea.SNPs,
+  genotypes = GROAN.KI$SNPs,
   covariances = NULL,
   extraCovariates = NULL,
   mode = 'tune',
@@ -104,14 +104,14 @@ results.tune = phenoRegressor.SVR(
 )
 
 #examining the predictions
-plot(GROAN.pea.yield, results.tune$predictions,
+plot(GROAN.KI$yield, results.tune$predictions,
      main = 'Mode = TUNING\\nTrain set (black) and test set (red) regressions',
      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
-points(GROAN.pea.yield[1:10], results.tune$predictions[1:10], pch=16, col='red')
+points(GROAN.KI$yield[1:10], results.tune$predictions[1:10], pch=16, col='red')
 
 #printing correlations
-test.set.correlation  = cor(GROAN.pea.yield[1:10], results.tune$predictions[1:10])
-train.set.correlation = cor(GROAN.pea.yield[-(1:10)], results.tune$predictions[-(1:10)])
+test.set.correlation  = cor(GROAN.KI$yield[1:10], results.tune$predictions[1:10])
+train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results.tune$predictions[-(1:10)])
 writeLines(paste(
   'test-set correlation :', test.set.correlation,
   '\\ntrain-set correlation:', train.set.correlation
@@ -121,7 +121,7 @@ writeLines(paste(
 #training the SVR, hyperparameters are given
 results.train = phenoRegressor.SVR(
   phenotypes = phenos,
-  genotypes = GROAN.pea.SNPs,
+  genotypes = GROAN.KI$SNPs,
   covariances = NULL,
   extraCovariates = NULL,
   mode = 'train',
@@ -129,14 +129,14 @@ results.train = phenoRegressor.SVR(
 )
 
 #examining the predictions
-plot(GROAN.pea.yield, results.train$predictions,
+plot(GROAN.KI$yield, results.train$predictions,
      main = 'Mode = TRAIN\\nTrain set (black) and test set (red) regressions',
      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
-points(GROAN.pea.yield[1:10], results.train$predictions[1:10], pch=16, col='red')
+points(GROAN.KI$yield[1:10], results.train$predictions[1:10], pch=16, col='red')
 
 #printing correlations
-test.set.correlation  = cor(GROAN.pea.yield[1:10], results.train$predictions[1:10])
-train.set.correlation = cor(GROAN.pea.yield[-(1:10)], results.train$predictions[-(1:10)])
+test.set.correlation  = cor(GROAN.KI$yield[1:10], results.train$predictions[1:10])
+train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results.train$predictions[-(1:10)])
 writeLines(paste(
   'test-set correlation :', test.set.correlation,
   '\\ntrain-set correlation:', train.set.correlation
@@ -146,7 +146,7 @@ writeLines(paste(
 #we recover the trained model from previous run, predictions will be exactly the same
 results.run = phenoRegressor.SVR(
   phenotypes = phenos,
-  genotypes = GROAN.pea.SNPs,
+  genotypes = GROAN.KI$SNPs,
   covariances = NULL,
   extraCovariates = NULL,
   mode = 'run',
@@ -154,14 +154,14 @@ results.run = phenoRegressor.SVR(
 )
 
 #examining the predictions
-plot(GROAN.pea.yield, results.run$predictions,
+plot(GROAN.KI$yield, results.run$predictions,
      main = 'Mode = RUN\\nTrain set (black) and test set (red) regressions',
      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
-points(GROAN.pea.yield[1:10], results.run$predictions[1:10], pch=16, col='red')
+points(GROAN.KI$yield[1:10], results.run$predictions[1:10], pch=16, col='red')
 
 #printing correlations
-test.set.correlation  = cor(GROAN.pea.yield[1:10], results.run$predictions[1:10])
-train.set.correlation = cor(GROAN.pea.yield[-(1:10)], results.run$predictions[-(1:10)])
+test.set.correlation  = cor(GROAN.KI$yield[1:10], results.run$predictions[1:10])
+train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results.run$predictions[-(1:10)])
 writeLines(paste(
   'test-set correlation :', test.set.correlation,
   '\\ntrain-set correlation:', train.set.correlation

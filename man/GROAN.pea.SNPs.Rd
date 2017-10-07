@@ -3,9 +3,9 @@
 \docType{data}
 \name{GROAN.pea.SNPs}
 \alias{GROAN.pea.SNPs}
-\title{Data - pea SNP genotypes}
+\title{[DEPRECATED]}
 \format{A data frame with 103 rows and 647 variables. Each
-row represent a pea line, each column a SNP marker}
+row represent a pea KI line, each column a SNP marker}
 \source{
 Annicchiarico et al., \emph{GBS-Based Genomic Selection
 for Pea Grain Yield under Severe Terminal Drought}, The Plant Genome,
@@ -15,8 +15,7 @@ Volume 10. \doi{doi:10.3835/plantgenome2016.07.0072}
 GROAN.pea.SNPs
 }
 \description{
-SNP genotypes for 103 pea lines. Each line of this data frame represent
-a single pea line. Each column a SNP marker. Values can either be 0, 1, or 2,
-representing the three possible genotypes (AA, Aa, and aa, respectively).
+This piece of data is deprecated and will be dismissed in next
+release. Please use \link{GROAN.KI} instead.
 }
 \keyword{datasets}

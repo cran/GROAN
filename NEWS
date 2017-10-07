@@ -1,0 +1,10 @@
+Changes in 1.1:
+* GROAN.run now supports test on datasets different from the one used
+  for training. Its interface, GROAN.Result object and plotResult function
+  were changed accordingly
+* a second pea dataset, GROAN.AI, was included, and the old dataset was
+  refactored as GROAN.KI
+* old dataset notation (GROAN.pea.SNPs, GROAN.pea.yield,
+  GROAN.pea.kinship) was maintained but marked as deprecated in
+  documentation
+* added or improved print and summary function for all GROAN objects

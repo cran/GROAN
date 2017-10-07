@@ -30,7 +30,10 @@
 #'             it to be it somewhat meaningful (to you, GROAN simply reports it as it is)
 #' @param genotypes Matrix or dataframe containing SNP genotypes, one row per sample (N), one column per marker (M), 0/1/2 format (for diploids)
 #'                  or 0/1/2.../ploidy in case of polyploids
-#' @param covariance square (NxN) matrix of covariances between samples
+#' @param covariance matrix of covariances between samples of this dataset. It is usually a square (NxN) matrix,
+#'                   but rectangular matrices (NxW) are accepted to incapsulate covariances between samples in
+#'                   this set and samples of other sets. Please note that some regression models expect the
+#'                   covariance to be square and will fail on rectangular ones
 #' @param phenotypes numeric array, M slots
 #' @param strata array of M slots, describing the strata each data point belongs to. This is
 #'                used for stratified crossvalidation (see \code{\link{createWorkbench}})
@@ -42,18 +45,18 @@
 #' @param ... further arguments are passed along to noiseInjector
 #'
 #' @return a GROAN.NoisyDataset object.
-#' @seealso \link{GROAN.run} \link{createNoisyDataset}
+#' @seealso \link{GROAN.run} \link{createWorkbench}
 #' @export
 #'
 #' @examples #For more complete examples see the package vignette
 #' #creating a noisy dataset with normal noise
 #' nds = createNoisyDataset(
 #'   name = 'PEA, normal noise',
-#'   genotypes = GROAN.pea.SNPs,
-#'   phenotypes = GROAN.pea.yield,
+#'   genotypes = GROAN.KI$SNPs,
+#'   phenotypes = GROAN.KI$yield,
 #'   noiseInjector = noiseInjector.norm,
 #'   mean = 0,
-#'   sd = sd(GROAN.pea.yield) * 0.5
+#'   sd = sd(GROAN.KI$yield) * 0.5
 #' )
 createNoisyDataset = function (name, genotypes=NULL, covariance=NULL, phenotypes, strata=NULL, extraCovariates=NULL, ploidy=2, noiseInjector=noiseInjector.dummy, ...){
   #checking inputs
@@ -73,9 +76,15 @@ createNoisyDataset = function (name, genotypes=NULL, covariance=NULL, phenotypes
     covs = covariance,
     phenos = phenotypes,
     strata = strata,
+    strata.available = !is.null(strata),
     injector = noiseInjector,
     extraParms = list(...)
   )
+
+  #if no strata were specified, we fill with dummy values and take notes
+  if(!me$strata.available){
+    me$strata = rep('dummyStrata', length(me$phenos))
+  }
 
   #optional extra covariates get special treatment
   if (is.null(extraCovariates)){
@@ -205,17 +214,14 @@ check.genotypes = function(genotypes, n, ploidy){
   }
 }
 
-#check genotypes are a matrix/df in the form
-#-n x n (where n is the number of samples)
+#check covariance is a matrix/df in the form
+#-n x something (where n is the number of samples)
 #-no missings
 #fails if any condition is not met
 check.covariance = function(covariance, n){
   #dimensional check
   if (nrow(covariance) != n){
     stop(paste('Passed covariance should have as many rows as phenotypes slots.'), call. = FALSE)
-  }
-  if (ncol(covariance) != n){
-    stop(paste('Passed covariance should have as many columns as phenotypes slots.'), call. = FALSE)
   }
 
   #missing values
@@ -319,33 +325,154 @@ getExtraCovariatesNames = function(nds, separator=' '){
 #' @return This function returns the original \code{GROAN.NoisyDataset} object invisibly (via \link[=invisible]{invisible(x)})
 #' @export
 print.GROAN.NoisyDataset = function(x, ...){
-  writeLines(paste(sep='', 'name              : ', x$name))
-  writeLines(paste(sep='', 'ploidy            : ', x$ploidy))
-  writeLines(paste(sep='', 'samples           : ', length(x$phenos)))
-
-  SNPs.num = 'absent'
-  if (!is.null(x$genos)){
-    SNPs.num = ncol(x$genos)
-  }
-  writeLines(paste(sep='', 'SNPs              : ', SNPs.num))
-
-  covariance = 'present'
-  if (is.null(x$covs)){
-    covariance = 'absent'
-  }
-  writeLines(paste(sep='', 'covariance matrix : ', covariance))
-
-  extraCovariates = 'absent'
-  if (!is.null(x$extraCovariates)){
-    extraCovariates = paste(collapse = ', ', colnames(x$extraCovariates))
-  }
-  writeLines(paste(sep='', 'extra covariates  : ', extraCovariates))
-
-  strata = 'absent'
-  if (!is.null(x$strata)){
-    strata = paste(collapse = ', ', unique(x$strata))
-  }
-  writeLines(paste(sep='', 'strata           : ', strata))
+  print(summary(x))
 
   return(invisible(x))
+}
+
+#' Summary for GROAN Noisy Dataset object
+#'
+#' Returns a dataframe with some descriptioon of an object created with \link{createNoisyDataset}.
+#'
+#' @param object instance of class GROAN.NoisyDataset.
+#' @param ... additional arguments ignored, added for compatibility to generic \code{summary} function
+#'
+#' @return a data frame with GROAN.NoisyDataset stats.
+#' @export
+summary.GROAN.NoisyDataset = function(object, ...){
+  res = data.frame()
+  res['dataset.name', 'value'] = object$name
+  res['ploidy', 'value'] = object$ploidy
+  res['samples', 'value'] = length(object$phenos)
+
+  res['SNPs.num', 'value'] = 'absent'
+  if (!is.null(object$genos)){
+    res['SNPs.num', 'value'] = ncol(object$genos)
+  }
+
+  res['covariance', 'value'] = 'present'
+  if (is.null(object$covs)){
+    res['covariance', 'value'] = 'absent'
+  }
+
+  res['extraCovariates', 'value'] = 'absent'
+  if (!is.null(object$extraCovs)){
+    res['extraCovariates', 'value'] = paste(collapse = ', ', object$extraCovsOriginalNames)
+  }
+
+  res['strata', 'value'] = 'absent'
+  if(object$strata.available){
+    res['strata', 'value'] = paste(collapse = ', ', unique(object$strata))
+  }
+
+  return(res)
+}
+
+#' Check two GROAN.NoisyDataSet for dimension compatibility
+#'
+#' This function verifies that the two passed GROAN.NoisyDataSet objects have
+#' the same dimensions and can thus be used in the same experiment (typically training
+#' models on one and testing on the other). The function returns a TRUE/FALSE. In \code{verbose}
+#' mode the function also prints messages detailing the comparisons.
+#'
+#' @param nds1 the first GROAN.NoisyDataSet to be tested
+#' @param nds2 the second GROAN.NoisyDataSet to be tested
+#' @param verbose boolean, if TRUE the function prints messages detailing the comparison.
+#'
+#' @return TRUE if the passed GROAN.NoisyDataSet are dimensionally compatible, FALSE otherwise
+#' @export
+are.compatible = function(nds1, nds2, verbose=FALSE){
+  #test on arguments
+  if (!'GROAN.NoisyDataset' %in% class(nds1)) stop('First argument is not a GROAN.NoisyDataset')
+  if (!'GROAN.NoisyDataset' %in% class(nds2)) stop('Second argument is not a GROAN.NoisyDataset')
+  if (!is.boolean(verbose)) stop('Parameter "verbose" should be boolean')
+
+  #retrieving the two summaries, will be used for comparison
+  nds1.sum = summary(nds1)
+  nds2.sum = summary(nds2)
+
+  #comparing the value column
+  check = nds1.sum$value == nds2.sum$value
+  names(check) = rownames(nds1.sum)
+
+  #output message, printed only if verbose==TRUE
+  msg.tot = NULL
+  res = TRUE
+
+  #ploidy
+  msg = 'Comparing ploidy...'
+  if (check['ploidy']){
+    msg = paste(msg, 'OK')
+  }else{
+    res = FALSE
+    msg = paste(msg, 'ERROR')
+  }
+  msg.tot = c(msg.tot, msg)
+
+  #SNP number
+  msg = 'Comparing SNP number...'
+  if (check['SNPs.num']){
+    msg = paste(msg, 'OK')
+  }else{
+    res = FALSE
+    msg = paste(msg, 'ERROR: SNP number differs')
+  }
+  msg.tot = c(msg.tot, msg)
+
+  #SNP names
+  msg = 'Comparing SNP names...'
+  SNP.names.nds1 = colnames(nds1$genos)
+  SNP.names.nds2 = colnames(nds1$genos)
+  if (all(SNP.names.nds1 == SNP.names.nds1)){
+    msg = paste(msg, 'OK')
+  }else{
+    res = FALSE
+    msg = paste(msg, 'ERROR: SNP names differ')
+  }
+  msg.tot = c(msg.tot, msg)
+
+  #Covariance
+  msg = 'Comparing covariance matrix...'
+  if (check['covariance']){
+    msg = paste(msg, 'OK')
+  }else{
+    res = FALSE
+    msg = paste(msg, 'ERROR: covariance must be either present or absent in both datasets')
+  }
+  msg.tot = c(msg.tot, msg)
+
+  #Comparing convariances (if present)
+  if (nds1.sum['covariance', 'value'] == 'present' & nds2.sum['covariance', 'value'] == 'present'){
+    msg = 'Comparing covariance size...'
+    if (ncol(nds1$covs) == ncol(nds2$covs)){
+      msg = paste(msg, 'OK')
+    }else{
+      res = FALSE
+      msg = paste(msg, 'ERROR: covariance matrices must have the same number of columns in the two datasets')
+    }
+    msg.tot = c(msg.tot, msg)
+
+    msg = 'Comparing covariance columns...'
+    if (all(colnames(nds1$covs) == colnames(nds2$covs))){
+      msg = paste(msg, 'OK')
+    }else{
+      res = FALSE
+      msg = paste(msg, 'ERROR: column names differ')
+    }
+    msg.tot = c(msg.tot, msg)
+  }
+
+  #Extra covariates
+  msg = paste(sep='', 'Comparing extra covariates...')
+  if (check['extraCovariates']){
+    msg = paste(msg, 'OK')
+  }else{
+    res = FALSE
+    msg = paste(msg, 'ERROR: extra covariates names differ')
+  }
+  msg.tot = c(msg.tot, msg)
+
+  #and we are done
+  if (verbose) writeLines(msg.tot)
+  return(res)
 }

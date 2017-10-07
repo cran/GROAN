@@ -49,14 +49,14 @@ specific experiment.\cr
 }
 \examples{
 \dontrun{
-#using the GROAN.pea dataset, we regress on the dataset and predict the first ten phenotypes
-phenos = GROAN.pea.yield
+#using the GROAN.KI dataset, we regress on the dataset and predict the first ten phenotypes
+phenos = GROAN.KI$yield
 phenos[1:10]  = NA
 
 #calling the regressor with random forest
 results = phenoRegressor.RFR(
   phenotypes = phenos,
-  genotypes = GROAN.pea.SNPs,
+  genotypes = GROAN.KI$SNPs,
   covariances = NULL,
   extraCovariates = NULL,
   ntree = 20,
@@ -64,14 +64,14 @@ results = phenoRegressor.RFR(
 )
 
 #examining the predictions
-plot(GROAN.pea.yield, results$predictions,
+plot(GROAN.KI$yield, results$predictions,
      main = 'Train set (black) and test set (red) regressions',
      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
-points(GROAN.pea.yield[1:10], results$predictions[1:10], pch=16, col='red')
+points(GROAN.KI$yield[1:10], results$predictions[1:10], pch=16, col='red')
 
 #printing correlations
-test.set.correlation  = cor(GROAN.pea.yield[1:10], results$predictions[1:10])
-train.set.correlation = cor(GROAN.pea.yield[-(1:10)], results$predictions[-(1:10)])
+test.set.correlation  = cor(GROAN.KI$yield[1:10], results$predictions[1:10])
+train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results$predictions[-(1:10)])
 writeLines(paste(
   'test-set correlation :', test.set.correlation,
   '\\ntrain-set correlation:', train.set.correlation

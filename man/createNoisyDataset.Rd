@@ -16,7 +16,10 @@ it to be it somewhat meaningful (to you, GROAN simply reports it as it is)}
 \item{genotypes}{Matrix or dataframe containing SNP genotypes, one row per sample (N), one column per marker (M), 0/1/2 format (for diploids)
 or 0/1/2.../ploidy in case of polyploids}
 
-\item{covariance}{square (NxN) matrix of covariances between samples}
+\item{covariance}{matrix of covariances between samples of this dataset. It is usually a square (NxN) matrix,
+but rectangular matrices (NxW) are accepted to incapsulate covariances between samples in
+this set and samples of other sets. Please note that some regression models expect the
+covariance to be square and will fail on rectangular ones}
 
 \item{phenotypes}{numeric array, M slots}
 
@@ -48,13 +51,13 @@ function.
 #creating a noisy dataset with normal noise
 nds = createNoisyDataset(
   name = 'PEA, normal noise',
-  genotypes = GROAN.pea.SNPs,
-  phenotypes = GROAN.pea.yield,
+  genotypes = GROAN.KI$SNPs,
+  phenotypes = GROAN.KI$yield,
   noiseInjector = noiseInjector.norm,
   mean = 0,
-  sd = sd(GROAN.pea.yield) * 0.5
+  sd = sd(GROAN.KI$yield) * 0.5
 )
 }
 \seealso{
-\link{GROAN.run} \link{createNoisyDataset}
+\link{GROAN.run} \link{createWorkbench}
 }
