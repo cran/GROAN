@@ -36,3 +36,4 @@ Other noiseInjectors: \code{\link{noiseInjector.dummy}},
   \code{\link{noiseInjector.norm}},
   \code{\link{noiseInjector.unif}}
 }
+\concept{noiseInjectors}

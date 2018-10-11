@@ -4,14 +4,17 @@
 \alias{plotResult}
 \title{Plot results of a run}
 \usage{
-plotResult(res, variable = c("pearson", "spearman", "rmse", "time_per_fold",
-  "coeff_det", "mae"), plot.type = c("box", "bar", "bar_conf95"),
+plotResult(res, variable = c("pearson", "spearman", "rmse",
+  "time_per_fold", "coeff_det", "mae"), x.label = c("both", "train_only",
+  "test_only"), plot.type = c("box", "bar", "bar_conf95"),
   strata = c("no_strata", "avg_strata", "single"))
 }
 \arguments{
 \item{res}{a result data frame containing the output of GROAN.run}
 
-\item{variable}{name of the variable to be plotted}
+\item{variable}{name of the variable to be used as y values}
+
+\item{x.label}{select what to put on x-axis between both train and test dataset (default), train dataset only or test dataset only}
 
 \item{plot.type}{a string indicating the type of plot to be obtained}
 

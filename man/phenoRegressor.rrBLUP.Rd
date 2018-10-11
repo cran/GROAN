@@ -2,9 +2,9 @@
 % Please edit documentation in R/regressors.R
 \name{phenoRegressor.rrBLUP}
 \alias{phenoRegressor.rrBLUP}
-\title{SNP-blup using rrBLUP package}
+\title{SNP-BLUP or G-BLUP using rrBLUP package}
 \usage{
-phenoRegressor.rrBLUP(phenotypes, genotypes, covariances = NULL,
+phenoRegressor.rrBLUP(phenotypes, genotypes = NULL, covariances = NULL,
   extraCovariates = NULL, ...)
 }
 \arguments{
@@ -13,7 +13,7 @@ phenoRegressor.rrBLUP(phenotypes, genotypes, covariances = NULL,
 \item{genotypes}{SNP genotypes, one row per phenotype (n), one column per marker (m), values in 0/1/2 for
 diploids or 0/1/2/...ploidy for polyploids. Can be NULL if \code{covariances} is present.}
 
-\item{covariances}{square matrix (n x n) of covariances, ignored (included for coherence with other regressors).}
+\item{covariances}{square matrix (n x n) of covariances.}
 
 \item{extraCovariates}{optional extra covariates set, one row per phenotype (n), one column per covariate (w).
 If NULL no extra covariates are considered.}
@@ -30,10 +30,12 @@ The function returns a list with the following fields:
 }
 \description{
 This is a wrapper around \code{rrBLUP} function \code{\link[rrBLUP]{mixed.solve}}.
-Genotypes are modeled as random effects (matrix Z) and extra covariates,
-if present, as fixed effects (matrix X).
-Argument \code{covariances} is ignored.\cr
-Please note that this function won't work if SNPs are not passed and if rrBLUP package is not installed.
+It can either work with genotypes (in form of a SNP matrix) or with kinships (in form of a covariance
+matrix). In the first case the function will implement a SNP-BLUP, in the second a G-BLUP. An error is
+returned if both SNPs and covariance matrix are passed.\cr
+In rrBLUP terms, genotypes are modeled as random effects (matrix Z), covariances as matrix K, and
+extra covariates, if present, as fixed effects (matrix X).\cr
+Please note that this function won't work if rrBLUP package is not installed.
 }
 \examples{
 \dontrun{
@@ -41,28 +43,43 @@ Please note that this function won't work if SNPs are not passed and if rrBLUP p
 phenos = GROAN.KI$yield
 phenos[1:10]  = NA
 
-#calling the regressor with ridge regression BLUP on SNPs
-results = phenoRegressor.rrBLUP(
+#calling the regressor with ridge regression BLUP on SNPs and kinship
+results.SNP.BLUP = phenoRegressor.rrBLUP(
   phenotypes = phenos,
   genotypes = GROAN.KI$SNPs,
-  covariances = NULL,
-  extraCovariates = NULL,
+  SE = TRUE, return.Hinv = TRUE #rrBLUP-specific parameters
+)
+results.G.BLUP = phenoRegressor.rrBLUP(
+  phenotypes = phenos,
+  covariances = GROAN.KI$kinship,
   SE = TRUE, return.Hinv = TRUE #rrBLUP-specific parameters
 )
 
 #examining the predictions
-plot(GROAN.KI$yield, results$predictions,
-     main = 'Train set (black) and test set (red) regressions',
+plot(GROAN.KI$yield, results.SNP.BLUP$predictions,
+     main = '[SNP-BLUP] Train set (black) and test set (red) regressions',
      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
-points(GROAN.KI$yield[1:10], results$predictions[1:10], pch=16, col='red')
+abline(a=0, b=1)
+points(GROAN.KI$yield[1:10], results.SNP.BLUP$predictions[1:10], pch=16, col='red')
+
+plot(GROAN.KI$yield, results.G.BLUP$predictions,
+     main = '[G-BLUP] Train set (black) and test set (red) regressions',
+     xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
+abline(a=0, b=1)
+points(GROAN.KI$yield[1:10], results.G.BLUP$predictions[1:10], pch=16, col='red')
 
 #printing correlations
-test.set.correlation  = cor(GROAN.KI$yield[1:10], results$predictions[1:10])
-train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results$predictions[-(1:10)])
-writeLines(paste(
-  'test-set correlation :', test.set.correlation,
-  '\\ntrain-set correlation:', train.set.correlation
+correlations = data.frame(
+  model = 'SNP-BLUP',
+  test_set_correlations = cor(GROAN.KI$yield[1:10], results.SNP.BLUP$predictions[1:10]),
+  train_set_correlations = cor(GROAN.KI$yield[-(1:10)], results.SNP.BLUP$predictions[-(1:10)])
+)
+correlations = rbind(correlations, data.frame(
+  model = 'G-BLUP',
+  test_set_correlations = cor(GROAN.KI$yield[1:10], results.G.BLUP$predictions[1:10]),
+  train_set_correlations = cor(GROAN.KI$yield[-(1:10)], results.G.BLUP$predictions[-(1:10)])
 ))
+print(correlations)
 }
 }
 \seealso{
@@ -73,3 +90,4 @@ Other phenoRegressors: \code{\link{phenoRegressor.BGLR}},
   \code{\link{phenoRegressor.SVR}},
   \code{\link{phenoRegressor.dummy}}
 }
+\concept{phenoRegressors}

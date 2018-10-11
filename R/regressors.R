@@ -212,18 +212,20 @@ phenoRegressor.BGLR = function (phenotypes, genotypes, covariances, extraCovaria
   ))
 }
 
-#' SNP-blup using rrBLUP package
+#' SNP-BLUP or G-BLUP using rrBLUP package
 #'
 #' This is a wrapper around \code{rrBLUP} function \code{\link[rrBLUP]{mixed.solve}}.
-#' Genotypes are modeled as random effects (matrix Z) and extra covariates,
-#' if present, as fixed effects (matrix X).
-#' Argument \code{covariances} is ignored.\cr
-#' Please note that this function won't work if SNPs are not passed and if rrBLUP package is not installed.
+#' It can either work with genotypes (in form of a SNP matrix) or with kinships (in form of a covariance
+#' matrix). In the first case the function will implement a SNP-BLUP, in the second a G-BLUP. An error is
+#' returned if both SNPs and covariance matrix are passed.\cr
+#' In rrBLUP terms, genotypes are modeled as random effects (matrix Z), covariances as matrix K, and
+#' extra covariates, if present, as fixed effects (matrix X).\cr
+#' Please note that this function won't work if rrBLUP package is not installed.
 #'
 #' @param phenotypes phenotypes, a numeric array (n x 1), missing values are predicted
 #' @param genotypes SNP genotypes, one row per phenotype (n), one column per marker (m), values in 0/1/2 for
 #'                  diploids or 0/1/2/...ploidy for polyploids. Can be NULL if \code{covariances} is present.
-#' @param covariances square matrix (n x n) of covariances, ignored (included for coherence with other regressors).
+#' @param covariances square matrix (n x n) of covariances.
 #' @param extraCovariates optional extra covariates set, one row per phenotype (n), one column per covariate (w).
 #'                 If NULL no extra covariates are considered.
 #' @param ... extra parameters are passed to rrBLUP::mixed.solve
@@ -243,51 +245,68 @@ phenoRegressor.BGLR = function (phenotypes, genotypes, covariances, extraCovaria
 #' phenos = GROAN.KI$yield
 #' phenos[1:10]  = NA
 #'
-#' #calling the regressor with ridge regression BLUP on SNPs
-#' results = phenoRegressor.rrBLUP(
+#' #calling the regressor with ridge regression BLUP on SNPs and kinship
+#' results.SNP.BLUP = phenoRegressor.rrBLUP(
 #'   phenotypes = phenos,
 #'   genotypes = GROAN.KI$SNPs,
-#'   covariances = NULL,
-#'   extraCovariates = NULL,
+#'   SE = TRUE, return.Hinv = TRUE #rrBLUP-specific parameters
+#' )
+#' results.G.BLUP = phenoRegressor.rrBLUP(
+#'   phenotypes = phenos,
+#'   covariances = GROAN.KI$kinship,
 #'   SE = TRUE, return.Hinv = TRUE #rrBLUP-specific parameters
 #' )
 #'
 #' #examining the predictions
-#' plot(GROAN.KI$yield, results$predictions,
-#'      main = 'Train set (black) and test set (red) regressions',
+#' plot(GROAN.KI$yield, results.SNP.BLUP$predictions,
+#'      main = '[SNP-BLUP] Train set (black) and test set (red) regressions',
 #'      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
-#' points(GROAN.KI$yield[1:10], results$predictions[1:10], pch=16, col='red')
+#' abline(a=0, b=1)
+#' points(GROAN.KI$yield[1:10], results.SNP.BLUP$predictions[1:10], pch=16, col='red')
+#'
+#' plot(GROAN.KI$yield, results.G.BLUP$predictions,
+#'      main = '[G-BLUP] Train set (black) and test set (red) regressions',
+#'      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
+#' abline(a=0, b=1)
+#' points(GROAN.KI$yield[1:10], results.G.BLUP$predictions[1:10], pch=16, col='red')
 #'
 #' #printing correlations
-#' test.set.correlation  = cor(GROAN.KI$yield[1:10], results$predictions[1:10])
-#' train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results$predictions[-(1:10)])
-#' writeLines(paste(
-#'   'test-set correlation :', test.set.correlation,
-#'   '\ntrain-set correlation:', train.set.correlation
+#' correlations = data.frame(
+#'   model = 'SNP-BLUP',
+#'   test_set_correlations = cor(GROAN.KI$yield[1:10], results.SNP.BLUP$predictions[1:10]),
+#'   train_set_correlations = cor(GROAN.KI$yield[-(1:10)], results.SNP.BLUP$predictions[-(1:10)])
+#' )
+#' correlations = rbind(correlations, data.frame(
+#'   model = 'G-BLUP',
+#'   test_set_correlations = cor(GROAN.KI$yield[1:10], results.G.BLUP$predictions[1:10]),
+#'   train_set_correlations = cor(GROAN.KI$yield[-(1:10)], results.G.BLUP$predictions[-(1:10)])
 #' ))
+#' print(correlations)
 #' }
-phenoRegressor.rrBLUP = function (phenotypes, genotypes, covariances=NULL, extraCovariates = NULL, ...){
+phenoRegressor.rrBLUP = function (phenotypes, genotypes=NULL, covariances=NULL, extraCovariates = NULL, ...){
   #is rrBLUP installed?
   if (!requireNamespace("rrBLUP", quietly = TRUE)) {
     stop("rrBLUP package needed for this regressor to work. Please install it.",
          call. = FALSE)
   }
 
-  #here, in theory, we should have a nice IF selecting either SNP-BLUP or G-BLUP
-  #In practice I was never able to implement G-BLUP using rrBLUP library. As such, only
-  #the SNP-BLUP is here :(
-
-  #is the number of matrices correct?
-  if (is.null(genotypes)){
-    stop("SNP matrix is needed for (rrBLUP based) SNP blup", call. = FALSE)
+  #we need either genotypes or covariances (but not both!)
+  if (!xor(is.null(genotypes), is.null(covariances))){
+    stop("rrBLUP regressor requires either genotypes (SNPs) or covariances (usually kinship matrices), and not both!",
+         call. = FALSE)
   }
 
-  return(phenoRegressor.rrBLUP.SNP(phenotypes, genotypes, extraCovariates, ...))
+  #which function should I call?
+  if (is.null(genotypes)){
+    return(phenoRegressor.rrBLUP.G(phenotypes = phenotypes, covariances = covariances, extraCovariates = extraCovariates, ...))
+  }else{
+    return(phenoRegressor.rrBLUP.SNP(phenotypes, genotypes, extraCovariates, ...))
+  }
 }
 
-#' SNP BLUP using rrBLUP library
+#' SNP-BLUP using rrBLUP library
 #'
-#' Implementation of SNP blup using rrBLUP library. Not to be exported.
+#' Implementation of SNP-BLUP using rrBLUP library. Not to be exported.
 #'
 #' @param phenotypes phenotypes, a numeric array (n x 1), missing values are predicted
 #' @param genotypes SNP genotypes, one row per phenotype (n), one column per marker (m), values in 0/1/2 for
@@ -333,10 +352,9 @@ phenoRegressor.rrBLUP.SNP = function (phenotypes, genotypes, extraCovariates = N
   ))
 }
 
-#' NOT IMPLEMENTED - G BLUP using rrBLUP library
+#' G-BLUP using rrBLUP library
 #'
-#' This function SHOULD implement G blup using rrBLUP library. However I was
-#' never able to make it work :( Not to be exported.
+#' This function implements G-BLUP using rrBLUP library. Not to be exported.
 #'
 #' @param phenotypes phenotypes, a numeric array (n x 1), missing values are predicted
 #' @param covariances square matrix (n x n) of covariances.
@@ -353,25 +371,19 @@ phenoRegressor.rrBLUP.SNP = function (phenotypes, genotypes, extraCovariates = N
 #'   \item \code{extradata}   : list with information on trained model, coming from \code{\link[rrBLUP]{mixed.solve}}
 #' }
 phenoRegressor.rrBLUP.G = function (phenotypes, covariances, extraCovariates = NULL, ...){
-  #a handy selector to separate test and train sets
-  test = is.na(phenotypes)
-
   #extracting sample names
   samples = rownames(covariances)
-  if (length(samples) == 0){
-    samples = paste(sep='', 's', 1:length(phenotypes))
-  }
 
   #we need to build a dataframe with all the required data
   df = data.frame(
     'phenotypes' = phenotypes,
-    'samples' = samples,
-    extraCovariates
+    'samples' = samples
   )
 
-  #forcing the same names
-  rownames(covariances) = samples
-  colnames(covariances) = samples
+  #should we add extraCovariates as fixed effects?
+  if(!is.null(extraCovariates)){
+    df = cbind(df, extraCovariates)
+  }
 
   #we usually use GAUSS = FALSE to use passed kinship, but
   #the user takes precedence
@@ -381,10 +393,15 @@ phenoRegressor.rrBLUP.G = function (phenotypes, covariances, extraCovariates = N
     GAUSS.val = FALSE
   }
 
+  #if covariances are not already a matrix, this is a good moment to change
+  if (!is.matrix(covariances)){
+    covariances = as.matrix(covariances)
+  }
+
   #training the model
   m =  rrBLUP::kin.blup(
-    data = df, geno = 'samples', pheno = 'phenotypes',
-    GAUSS = GAUSS.val, K = covariances, covariate = colnames(extraCovariates))
+    data = df, geno = 'samples', pheno = 'phenotypes', fixed = colnames(extraCovariates),
+    GAUSS = GAUSS.val, K = covariances)
 
   #as predictions, we use the predicted genetic values, averaged over the fixed effects
   preds = m$pred
@@ -397,7 +414,7 @@ phenoRegressor.rrBLUP.G = function (phenotypes, covariances, extraCovariates = N
   ))
 }
 
-#' Suppor Vector Regression using package e1071
+#' Support Vector Regression using package e1071
 #'
 #' This is a wrapper around several functions from \code{e1071} package (as such, it won't work if
 #' e1071 package is not installed).

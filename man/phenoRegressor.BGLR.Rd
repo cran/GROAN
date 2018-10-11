@@ -5,7 +5,8 @@
 \title{Regression using BGLR package}
 \usage{
 phenoRegressor.BGLR(phenotypes, genotypes, covariances, extraCovariates,
-  type = c("FIXED", "BRR", "BL", "BayesA", "BayesB", "BayesC", "RKHS"), ...)
+  type = c("FIXED", "BRR", "BL", "BayesA", "BayesB", "BayesC", "RKHS"),
+  ...)
 }
 \arguments{
 \item{phenotypes}{phenotypes, a numeric array (n x 1), missing values are predicted}
@@ -80,3 +81,4 @@ Other phenoRegressors: \code{\link{phenoRegressor.RFR}},
   \code{\link{phenoRegressor.dummy}},
   \code{\link{phenoRegressor.rrBLUP}}
 }
+\concept{phenoRegressors}

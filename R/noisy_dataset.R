@@ -34,7 +34,7 @@
 #'                   but rectangular matrices (NxW) are accepted to incapsulate covariances between samples in
 #'                   this set and samples of other sets. Please note that some regression models expect the
 #'                   covariance to be square and will fail on rectangular ones
-#' @param phenotypes numeric array, M slots
+#' @param phenotypes numeric array, N slots
 #' @param strata array of M slots, describing the strata each data point belongs to. This is
 #'                used for stratified crossvalidation (see \code{\link{createWorkbench}})
 #' @param extraCovariates dataframe of optional extra covariates (N lines, one column per extra covariate).
@@ -332,7 +332,7 @@ print.GROAN.NoisyDataset = function(x, ...){
 
 #' Summary for GROAN Noisy Dataset object
 #'
-#' Returns a dataframe with some descriptioon of an object created with \link{createNoisyDataset}.
+#' Returns a dataframe with some description of an object created with \link{createNoisyDataset}.
 #'
 #' @param object instance of class GROAN.NoisyDataset.
 #' @param ... additional arguments ignored, added for compatibility to generic \code{summary} function

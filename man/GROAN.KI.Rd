@@ -12,7 +12,7 @@
 representing the three possible genotypes (AA, Aa, and aa, respectively).
  \item{\emph{"GROAN.KI$kinship"}}: square dataframe containing the realized kinships between
 all pairs of each of the 103 pea KI lines. Values were computed following the
-\href{http://www.jstor.org/stable/25681325}{Astle & Balding metric}.
+\href{https://www.jstor.org/stable/25681325}{Astle & Balding metric}.
 Higher values represent a higher degree of genetic similarity between
 lines. This metric mainly accounts for additive genetic contributions
 (as an alternative to dominant contributions).

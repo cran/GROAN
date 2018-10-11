@@ -29,7 +29,7 @@
 #' Once the \code{GROAN.Workbench} is created it must be passed to \link{GROAN.run} to start the experiment.\cr
 #'
 #' @param folds number of folds for crossvalidation, defaults to 10. If \code{NULL} no crossvalidation happens and
-#'              all training data will be used. In this case a second dataset, for test, is neede (see \link{GROAN.run}
+#'              all training data will be used. In this case a second dataset, for test, is needed (see \link{GROAN.run}
 #'              for details)
 #' @param reps number of times the whole test must be repeated, defaults to 5
 #' @param stratified boolean indicating whether GROAN should take into account data strata. This have two

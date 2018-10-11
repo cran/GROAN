@@ -2,9 +2,10 @@
 % Please edit documentation in R/regressors.R
 \name{phenoRegressor.rrBLUP.SNP}
 \alias{phenoRegressor.rrBLUP.SNP}
-\title{SNP BLUP using rrBLUP library}
+\title{SNP-BLUP using rrBLUP library}
 \usage{
-phenoRegressor.rrBLUP.SNP(phenotypes, genotypes, extraCovariates = NULL, ...)
+phenoRegressor.rrBLUP.SNP(phenotypes, genotypes, extraCovariates = NULL,
+  ...)
 }
 \arguments{
 \item{phenotypes}{phenotypes, a numeric array (n x 1), missing values are predicted}
@@ -26,6 +27,6 @@ The function returns a list with the following fields:
 }
 }
 \description{
-Implementation of SNP blup using rrBLUP library. Not to be exported.
+Implementation of SNP-BLUP using rrBLUP library. Not to be exported.
 }
 \keyword{internal}

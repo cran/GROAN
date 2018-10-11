@@ -6,12 +6,12 @@
 \usage{
 createWorkbench(folds = 10, reps = 5, stratified = FALSE,
   outfolder = NULL, saveHyperParms = FALSE, saveExtraData = FALSE,
-  regressor = phenoRegressor.rrBLUP, regressor.name = "default regressor",
-  ...)
+  regressor = phenoRegressor.rrBLUP,
+  regressor.name = "default regressor", ...)
 }
 \arguments{
 \item{folds}{number of folds for crossvalidation, defaults to 10. If \code{NULL} no crossvalidation happens and
-all training data will be used. In this case a second dataset, for test, is neede (see \link{GROAN.run}
+all training data will be used. In this case a second dataset, for test, is needed (see \link{GROAN.run}
 for details)}
 
 \item{reps}{number of times the whole test must be repeated, defaults to 5}

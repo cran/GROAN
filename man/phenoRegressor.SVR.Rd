@@ -2,7 +2,7 @@
 % Please edit documentation in R/regressors.R
 \name{phenoRegressor.SVR}
 \alias{phenoRegressor.SVR}
-\title{Suppor Vector Regression using package e1071}
+\title{Support Vector Regression using package e1071}
 \usage{
 phenoRegressor.SVR(phenotypes, genotypes, covariances, extraCovariates,
   mode = c("tune", "train", "run"), tuned.model = NULL,
@@ -176,3 +176,4 @@ Other phenoRegressors: \code{\link{phenoRegressor.BGLR}},
   \code{\link{phenoRegressor.dummy}},
   \code{\link{phenoRegressor.rrBLUP}}
 }
+\concept{phenoRegressors}

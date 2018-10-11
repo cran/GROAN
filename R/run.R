@@ -282,9 +282,32 @@ GROAN.run = function(nds, wb, nds.test = NULL, run.id = createRunId()){
           #all the extra data go into a list
           extradata = list(preds$extradata)
 
-          #adding real and predicted phenotypes
+          #adding real and, if meaningful, predicted phenotypes
+          extradata$GROAN_train_dataset = nds$name
           extradata$GROAN_phenotypes_real = nds$phenos[f.selectors == f]
           extradata$GROAN_phenotypes_predicted = preds$predictions[f.selectors == f]
+
+          #if we have extra test dataset, the predicted phenotypes should be added as well
+          #for each available dataset
+          for (dataset.current in unique(all.data$datasets)){
+            #this selector tells what samples have been predicted
+            prediction.selector = all.data$datasets == dataset.current
+
+            #do we have something to work on?
+            if(!any(prediction.selector)){
+              #nothing to do here, we simply skip
+              next
+            }
+
+            #if current dataset is the train one we skip
+            if(dataset.current == nds$name){
+              next
+            }
+
+            #at this point we can store the actual predicted phenotypes
+            label = paste(sep='', 'GROAN_phenotypes_predicted_', dataset.current)
+            extradata[[label]] = preds$predictions[prediction.selector]
+          }
 
           #saving the extra data
           #save(extradata, file = ed.filename, envir = as.environment(preds))

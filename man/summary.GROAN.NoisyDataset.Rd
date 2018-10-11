@@ -15,5 +15,5 @@
 a data frame with GROAN.NoisyDataset stats.
 }
 \description{
-Returns a dataframe with some descriptioon of an object created with \link{createNoisyDataset}.
+Returns a dataframe with some description of an object created with \link{createNoisyDataset}.
 }

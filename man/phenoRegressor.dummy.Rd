@@ -44,3 +44,4 @@ Other phenoRegressors: \code{\link{phenoRegressor.BGLR}},
   \code{\link{phenoRegressor.SVR}},
   \code{\link{phenoRegressor.rrBLUP}}
 }
+\concept{phenoRegressors}

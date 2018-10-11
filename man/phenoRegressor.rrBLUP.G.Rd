@@ -2,9 +2,10 @@
 % Please edit documentation in R/regressors.R
 \name{phenoRegressor.rrBLUP.G}
 \alias{phenoRegressor.rrBLUP.G}
-\title{NOT IMPLEMENTED - G BLUP using rrBLUP library}
+\title{G-BLUP using rrBLUP library}
 \usage{
-phenoRegressor.rrBLUP.G(phenotypes, covariances, extraCovariates = NULL, ...)
+phenoRegressor.rrBLUP.G(phenotypes, covariances, extraCovariates = NULL,
+  ...)
 }
 \arguments{
 \item{phenotypes}{phenotypes, a numeric array (n x 1), missing values are predicted}
@@ -25,7 +26,6 @@ The function returns a list with the following fields:
 }
 }
 \description{
-This function SHOULD implement G blup using rrBLUP library. However I was
-never able to make it work :( Not to be exported.
+This function implements G-BLUP using rrBLUP library. Not to be exported.
 }
 \keyword{internal}

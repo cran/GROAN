@@ -26,3 +26,4 @@ Other noiseInjectors: \code{\link{noiseInjector.norm}},
   \code{\link{noiseInjector.swapper}},
   \code{\link{noiseInjector.unif}}
 }
+\concept{noiseInjectors}

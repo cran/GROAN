@@ -1,3 +1,9 @@
+Changes in 1.2:
+* ridge regression BLUP now supports both SNP-BLUP and G-BLUP
+* plotResult function now has the option to select what to use as labels
+  for the x axis
+* typos in the documentation
+
 Changes in 1.1:
 * GROAN.run now supports test on datasets different from the one used
   for training. Its interface, GROAN.Result object and plotResult function

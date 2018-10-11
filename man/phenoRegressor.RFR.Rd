@@ -86,3 +86,4 @@ Other phenoRegressors: \code{\link{phenoRegressor.BGLR}},
   \code{\link{phenoRegressor.dummy}},
   \code{\link{phenoRegressor.rrBLUP}}
 }
+\concept{phenoRegressors}

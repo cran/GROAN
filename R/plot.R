@@ -30,7 +30,8 @@
 #'   }
 #'
 #' @param res a result data frame containing the output of GROAN.run
-#' @param variable name of the variable to be plotted
+#' @param variable name of the variable to be used as y values
+#' @param x.label select what to put on x-axis between both train and test dataset (default), train dataset only or test dataset only
 #' @param plot.type a string indicating the type of plot to be obtained
 #' @param strata string determining behaviour toward strata. If \code{'no_strata'} will plot
 #'               accuracies not considering strata. If \code{'avg_strata'} will average single
@@ -40,11 +41,13 @@
 #' @export
 plotResult = function (res,
                        variable=c('pearson', 'spearman', 'rmse', 'time_per_fold', 'coeff_det', 'mae'),
+                       x.label = c('both', 'train_only', 'test_only'),
                        plot.type=c('box', 'bar', 'bar_conf95'),
                        strata = c('no_strata', 'avg_strata', 'single')
                        ){
   #ensuring arguments consistency
   variable = match.arg(variable)
+  x.label = match.arg(x.label)
   plot.type = match.arg(plot.type)
   strata = match.arg(strata)
 
@@ -76,7 +79,15 @@ plotResult = function (res,
   }
 
   #creating a new column to be used for X
-  res$X = paste(sep='', 'TRAIN: ', res$dataset.train, '\nTEST: ', res$dataset.test)
+  if (x.label == 'both'){
+    res$X = paste(sep='', 'TRAIN: ', res$dataset.train, '\nTEST: ', res$dataset.test)
+  }
+  if (x.label == 'train_only'){
+    res$X = res$dataset.train
+  }
+  if (x.label == 'test_only'){
+    res$X = res$dataset.test
+  }
 
   #creating the base plot
 
@@ -144,5 +155,11 @@ getConfLimits = function(res, variable){
       ))
     }
   }
+
+  #making sure we are not losing the order (in case of factors)
+  if (is.factor(res$X)){
+    lims$X = factor(x = lims$X, levels = levels(res$X))
+  }
+
   return (lims)
 }

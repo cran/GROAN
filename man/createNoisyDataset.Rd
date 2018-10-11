@@ -4,8 +4,8 @@
 \alias{createNoisyDataset}
 \title{Noisy Data Set Constructor}
 \usage{
-createNoisyDataset(name, genotypes = NULL, covariance = NULL, phenotypes,
-  strata = NULL, extraCovariates = NULL, ploidy = 2,
+createNoisyDataset(name, genotypes = NULL, covariance = NULL,
+  phenotypes, strata = NULL, extraCovariates = NULL, ploidy = 2,
   noiseInjector = noiseInjector.dummy, ...)
 }
 \arguments{
@@ -21,7 +21,7 @@ but rectangular matrices (NxW) are accepted to incapsulate covariances between s
 this set and samples of other sets. Please note that some regression models expect the
 covariance to be square and will fail on rectangular ones}
 
-\item{phenotypes}{numeric array, M slots}
+\item{phenotypes}{numeric array, N slots}
 
 \item{strata}{array of M slots, describing the strata each data point belongs to. This is
 used for stratified crossvalidation (see \code{\link{createWorkbench}})}
