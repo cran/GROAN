@@ -4,8 +4,13 @@
 \alias{phenoRegressor.rrBLUP}
 \title{SNP-BLUP or G-BLUP using rrBLUP package}
 \usage{
-phenoRegressor.rrBLUP(phenotypes, genotypes = NULL, covariances = NULL,
-  extraCovariates = NULL, ...)
+phenoRegressor.rrBLUP(
+  phenotypes,
+  genotypes = NULL,
+  covariances = NULL,
+  extraCovariates = NULL,
+  ...
+)
 }
 \arguments{
 \item{phenotypes}{phenotypes, a numeric array (n x 1), missing values are predicted}
@@ -85,9 +90,10 @@ print(correlations)
 \seealso{
 \link[rrBLUP]{mixed.solve}
 
-Other phenoRegressors: \code{\link{phenoRegressor.BGLR}},
-  \code{\link{phenoRegressor.RFR}},
-  \code{\link{phenoRegressor.SVR}},
-  \code{\link{phenoRegressor.dummy}}
+Other phenoRegressors: 
+\code{\link{phenoRegressor.BGLR}()},
+\code{\link{phenoRegressor.RFR}()},
+\code{\link{phenoRegressor.SVR}()},
+\code{\link{phenoRegressor.dummy}()}
 }
 \concept{phenoRegressors}

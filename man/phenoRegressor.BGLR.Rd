@@ -4,9 +4,14 @@
 \alias{phenoRegressor.BGLR}
 \title{Regression using BGLR package}
 \usage{
-phenoRegressor.BGLR(phenotypes, genotypes, covariances, extraCovariates,
+phenoRegressor.BGLR(
+  phenotypes,
+  genotypes,
+  covariances,
+  extraCovariates,
   type = c("FIXED", "BRR", "BL", "BayesA", "BayesB", "BayesC", "RKHS"),
-  ...)
+  ...
+)
 }
 \arguments{
 \item{phenotypes}{phenotypes, a numeric array (n x 1), missing values are predicted}
@@ -69,16 +74,17 @@ test.set.correlation  = cor(GROAN.KI$yield[1:10], results$predictions[1:10])
 train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results$predictions[-(1:10)])
 writeLines(paste(
   'test-set correlation :', test.set.correlation,
-  '\\ntrain-set correlation:', train.set.correlation
+  '\ntrain-set correlation:', train.set.correlation
 ))
 }
 }
 \seealso{
 \link[BGLR]{BGLR}
 
-Other phenoRegressors: \code{\link{phenoRegressor.RFR}},
-  \code{\link{phenoRegressor.SVR}},
-  \code{\link{phenoRegressor.dummy}},
-  \code{\link{phenoRegressor.rrBLUP}}
+Other phenoRegressors: 
+\code{\link{phenoRegressor.RFR}()},
+\code{\link{phenoRegressor.SVR}()},
+\code{\link{phenoRegressor.dummy}()},
+\code{\link{phenoRegressor.rrBLUP}()}
 }
 \concept{phenoRegressors}

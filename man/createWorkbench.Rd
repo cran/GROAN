@@ -4,10 +4,17 @@
 \alias{createWorkbench}
 \title{Workbench constructor}
 \usage{
-createWorkbench(folds = 10, reps = 5, stratified = FALSE,
-  outfolder = NULL, saveHyperParms = FALSE, saveExtraData = FALSE,
+createWorkbench(
+  folds = 10,
+  reps = 5,
+  stratified = FALSE,
+  outfolder = NULL,
+  saveHyperParms = FALSE,
+  saveExtraData = FALSE,
   regressor = phenoRegressor.rrBLUP,
-  regressor.name = "default regressor", ...)
+  regressor.name = "default regressor",
+  ...
+)
 }
 \arguments{
 \item{folds}{number of folds for crossvalidation, defaults to 10. If \code{NULL} no crossvalidation happens and

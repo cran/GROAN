@@ -4,9 +4,17 @@
 \alias{createNoisyDataset}
 \title{Noisy Data Set Constructor}
 \usage{
-createNoisyDataset(name, genotypes = NULL, covariance = NULL,
-  phenotypes, strata = NULL, extraCovariates = NULL, ploidy = 2,
-  noiseInjector = noiseInjector.dummy, ...)
+createNoisyDataset(
+  name,
+  genotypes = NULL,
+  covariance = NULL,
+  phenotypes,
+  strata = NULL,
+  extraCovariates = NULL,
+  ploidy = 2,
+  noiseInjector = noiseInjector.dummy,
+  ...
+)
 }
 \arguments{
 \item{name}{A string defining the dataset name, used later do identify this

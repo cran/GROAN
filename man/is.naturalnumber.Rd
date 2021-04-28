@@ -19,6 +19,6 @@ TRUE if the value is a positive integer, FALSE otherwise (or NA)
 \code{is.naturalnumber} returns true if the passed argument
 is a positive integer, false otherwise.
 Implementation taken from Marcog's answer
-\href{http://stackoverflow.com/questions/4562257/what-is-the-fastest-way-to-check-if-a-number-is-a-positive-natural-number-in-r}{to this question}
+\href{https://stackoverflow.com/questions/4562257/what-is-the-fastest-way-to-check-if-a-number-is-a-positive-natural-number-in-r}{to this question}
 }
 \keyword{internal}

@@ -40,8 +40,9 @@ phenos.noise.subset = noiseInjector.norm(phenos, sd = 0.2, subset = 0.3)
 points(phenos.noise.subset, type='p', col='red')
 }
 \seealso{
-Other noiseInjectors: \code{\link{noiseInjector.dummy}},
-  \code{\link{noiseInjector.swapper}},
-  \code{\link{noiseInjector.unif}}
+Other noiseInjectors: 
+\code{\link{noiseInjector.dummy}()},
+\code{\link{noiseInjector.swapper}()},
+\code{\link{noiseInjector.unif}()}
 }
 \concept{noiseInjectors}

@@ -227,7 +227,7 @@ phenoRegressor.rrBLUP | Regressor from [rrBLUP](https://cran.r-project.org/packa
 phenoRegressor.SVR    | Support Vector Regression from package [e1071](https://cran.r-project.org/package=e1071). It can operate in three modes: a) _no training_ (an existing SVR object is needed), b) _training_ (when hyperparameters are known) and c) _tuning_ (when hyperpareters need to be optimized in a grid search, very slow)
 
 It is possible to extend GROAN functionalities by writing your own
-regressor, as detailed [here]({#custom_regressor})
+regressor, as detailed [here](#custom_regressor)
 
 ## Run GROAN, check results
 To run GROAN you need at least GROAN.NoisyDataset object and a GROAN.Workbench object. Once you have them the actual test is executed using the __GROAN.run__ function.

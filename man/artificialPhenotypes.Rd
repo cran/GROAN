@@ -4,8 +4,13 @@
 \alias{artificialPhenotypes}
 \title{Create a set of artificial phenotypes}
 \usage{
-artificialPhenotypes(genotypes, mu = 0, h2 = 0.8,
-  markersEffectDistr = "rnorm", ...)
+artificialPhenotypes(
+  genotypes,
+  mu = 0,
+  h2 = 0.8,
+  markersEffectDistr = "rnorm",
+  ...
+)
 }
 \arguments{
 \item{genotypes}{a samples x markers matrix of 0/1/2...ploidy}

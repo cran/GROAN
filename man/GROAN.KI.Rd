@@ -4,7 +4,8 @@
 \name{GROAN.KI}
 \alias{GROAN.KI}
 \title{Example data for pea KI lines}
-\format{A list with the following fields:
+\format{
+A list with the following fields:
 \itemize{
  \item{\emph{"GROAN.KI$yield"}}: named array with 103 slots, containing data on grain yield [t/ha]
  \item{\emph{"GROAN.KI$SNPs"}}: data frame with 103 rows and 647 variables. Each row is
@@ -16,7 +17,8 @@ all pairs of each of the 103 pea KI lines. Values were computed following the
 Higher values represent a higher degree of genetic similarity between
 lines. This metric mainly accounts for additive genetic contributions
 (as an alternative to dominant contributions).
-}}
+}
+}
 \source{
 Annicchiarico et al., \emph{GBS-Based Genomic Selection
 for Pea Grain Yield under Severe Terminal Drought}, The Plant Genome,

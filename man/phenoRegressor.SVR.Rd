@@ -4,9 +4,17 @@
 \alias{phenoRegressor.SVR}
 \title{Support Vector Regression using package e1071}
 \usage{
-phenoRegressor.SVR(phenotypes, genotypes, covariances, extraCovariates,
-  mode = c("tune", "train", "run"), tuned.model = NULL,
-  scale.pheno = TRUE, scale.geno = FALSE, ...)
+phenoRegressor.SVR(
+  phenotypes,
+  genotypes,
+  covariances,
+  extraCovariates,
+  mode = c("tune", "train", "run"),
+  tuned.model = NULL,
+  scale.pheno = TRUE,
+  scale.geno = FALSE,
+  ...
+)
 }
 \arguments{
 \item{phenotypes}{phenotypes, a numeric array (n x 1), missing values are predicted}
@@ -105,7 +113,7 @@ results.tune = phenoRegressor.SVR(
 
 #examining the predictions
 plot(GROAN.KI$yield, results.tune$predictions,
-     main = 'Mode = TUNING\\nTrain set (black) and test set (red) regressions',
+     main = 'Mode = TUNING\nTrain set (black) and test set (red) regressions',
      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
 points(GROAN.KI$yield[1:10], results.tune$predictions[1:10], pch=16, col='red')
 
@@ -114,7 +122,7 @@ test.set.correlation  = cor(GROAN.KI$yield[1:10], results.tune$predictions[1:10]
 train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results.tune$predictions[-(1:10)])
 writeLines(paste(
   'test-set correlation :', test.set.correlation,
-  '\\ntrain-set correlation:', train.set.correlation
+  '\ntrain-set correlation:', train.set.correlation
 ))
 
 #--------- TRAIN ---------
@@ -130,7 +138,7 @@ results.train = phenoRegressor.SVR(
 
 #examining the predictions
 plot(GROAN.KI$yield, results.train$predictions,
-     main = 'Mode = TRAIN\\nTrain set (black) and test set (red) regressions',
+     main = 'Mode = TRAIN\nTrain set (black) and test set (red) regressions',
      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
 points(GROAN.KI$yield[1:10], results.train$predictions[1:10], pch=16, col='red')
 
@@ -139,7 +147,7 @@ test.set.correlation  = cor(GROAN.KI$yield[1:10], results.train$predictions[1:10
 train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results.train$predictions[-(1:10)])
 writeLines(paste(
   'test-set correlation :', test.set.correlation,
-  '\\ntrain-set correlation:', train.set.correlation
+  '\ntrain-set correlation:', train.set.correlation
 ))
 
 #--------- RUN ---------
@@ -155,7 +163,7 @@ results.run = phenoRegressor.SVR(
 
 #examining the predictions
 plot(GROAN.KI$yield, results.run$predictions,
-     main = 'Mode = RUN\\nTrain set (black) and test set (red) regressions',
+     main = 'Mode = RUN\nTrain set (black) and test set (red) regressions',
      xlab = 'Original phenotypes', ylab = 'Predicted phenotypes')
 points(GROAN.KI$yield[1:10], results.run$predictions[1:10], pch=16, col='red')
 
@@ -164,16 +172,17 @@ test.set.correlation  = cor(GROAN.KI$yield[1:10], results.run$predictions[1:10])
 train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results.run$predictions[-(1:10)])
 writeLines(paste(
   'test-set correlation :', test.set.correlation,
-  '\\ntrain-set correlation:', train.set.correlation
+  '\ntrain-set correlation:', train.set.correlation
 ))
 }
 }
 \seealso{
 \link[e1071]{svm}, \link[e1071]{tune.svm}, \link[e1071]{best.svm} from e1071 package
 
-Other phenoRegressors: \code{\link{phenoRegressor.BGLR}},
-  \code{\link{phenoRegressor.RFR}},
-  \code{\link{phenoRegressor.dummy}},
-  \code{\link{phenoRegressor.rrBLUP}}
+Other phenoRegressors: 
+\code{\link{phenoRegressor.BGLR}()},
+\code{\link{phenoRegressor.RFR}()},
+\code{\link{phenoRegressor.dummy}()},
+\code{\link{phenoRegressor.rrBLUP}()}
 }
 \concept{phenoRegressors}

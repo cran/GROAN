@@ -32,8 +32,9 @@ phenos.sw4 = noiseInjector.swapper(phenos, 0.4)
 phenos.sw4.again = noiseInjector.swapper(phenos, 0.3)
 }
 \seealso{
-Other noiseInjectors: \code{\link{noiseInjector.dummy}},
-  \code{\link{noiseInjector.norm}},
-  \code{\link{noiseInjector.unif}}
+Other noiseInjectors: 
+\code{\link{noiseInjector.dummy}()},
+\code{\link{noiseInjector.norm}()},
+\code{\link{noiseInjector.unif}()}
 }
 \concept{noiseInjectors}

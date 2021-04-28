@@ -4,8 +4,10 @@
 \name{GROAN.pea.kinship}
 \alias{GROAN.pea.kinship}
 \title{[DEPRECATED]}
-\format{A data frame with 103 rows and 103 variables. Row and
-column names are pea KI lines.}
+\format{
+A data frame with 103 rows and 103 variables. Row and
+column names are pea KI lines.
+}
 \source{
 Annicchiarico et al., \emph{GBS-Based Genomic Selection
 for Pea Grain Yield under Severe Terminal Drought}, The Plant Genome,

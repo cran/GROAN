@@ -4,8 +4,10 @@
 \name{GROAN.pea.SNPs}
 \alias{GROAN.pea.SNPs}
 \title{[DEPRECATED]}
-\format{A data frame with 103 rows and 647 variables. Each
-row represent a pea KI line, each column a SNP marker}
+\format{
+A data frame with 103 rows and 647 variables. Each
+row represent a pea KI line, each column a SNP marker
+}
 \source{
 Annicchiarico et al., \emph{GBS-Based Genomic Selection
 for Pea Grain Yield under Severe Terminal Drought}, The Plant Genome,

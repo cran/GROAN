@@ -4,10 +4,13 @@
 \alias{plotResult}
 \title{Plot results of a run}
 \usage{
-plotResult(res, variable = c("pearson", "spearman", "rmse",
-  "time_per_fold", "coeff_det", "mae"), x.label = c("both", "train_only",
-  "test_only"), plot.type = c("box", "bar", "bar_conf95"),
-  strata = c("no_strata", "avg_strata", "single"))
+plotResult(
+  res,
+  variable = c("pearson", "spearman", "rmse", "time_per_fold", "coeff_det", "mae"),
+  x.label = c("both", "train_only", "test_only"),
+  plot.type = c("box", "bar", "bar_conf95"),
+  strata = c("no_strata", "avg_strata", "single")
+)
 }
 \arguments{
 \item{res}{a result data frame containing the output of GROAN.run}

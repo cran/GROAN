@@ -4,8 +4,14 @@
 \alias{phenoRegressor.RFR}
 \title{Random Forest Regression using package randomForest}
 \usage{
-phenoRegressor.RFR(phenotypes, genotypes, covariances, extraCovariates,
-  ntree = ceiling(length(phenotypes)/5), ...)
+phenoRegressor.RFR(
+  phenotypes,
+  genotypes,
+  covariances,
+  extraCovariates,
+  ntree = ceiling(length(phenotypes)/5),
+  ...
+)
 }
 \arguments{
 \item{phenotypes}{phenotypes, a numeric array (n x 1), missing values are predicted}
@@ -74,16 +80,17 @@ test.set.correlation  = cor(GROAN.KI$yield[1:10], results$predictions[1:10])
 train.set.correlation = cor(GROAN.KI$yield[-(1:10)], results$predictions[-(1:10)])
 writeLines(paste(
   'test-set correlation :', test.set.correlation,
-  '\\ntrain-set correlation:', train.set.correlation
+  '\ntrain-set correlation:', train.set.correlation
 ))
 }
 }
 \seealso{
 \link[randomForest]{randomForest}
 
-Other phenoRegressors: \code{\link{phenoRegressor.BGLR}},
-  \code{\link{phenoRegressor.SVR}},
-  \code{\link{phenoRegressor.dummy}},
-  \code{\link{phenoRegressor.rrBLUP}}
+Other phenoRegressors: 
+\code{\link{phenoRegressor.BGLR}()},
+\code{\link{phenoRegressor.SVR}()},
+\code{\link{phenoRegressor.dummy}()},
+\code{\link{phenoRegressor.rrBLUP}()}
 }
 \concept{phenoRegressors}

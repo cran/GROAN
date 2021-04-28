@@ -23,7 +23,7 @@
 #' \code{is.naturalnumber} returns true if the passed argument
 #' is a positive integer, false otherwise.
 #' Implementation taken from Marcog's answer
-#' \href{http://stackoverflow.com/questions/4562257/what-is-the-fastest-way-to-check-if-a-number-is-a-positive-natural-number-in-r}{to this question}
+#' \href{https://stackoverflow.com/questions/4562257/what-is-the-fastest-way-to-check-if-a-number-is-a-positive-natural-number-in-r}{to this question}
 #'
 #' @param x the value(s) to be tested
 #' @param low.Limit the greatest value not accepted. Defaults to zero, meaning that

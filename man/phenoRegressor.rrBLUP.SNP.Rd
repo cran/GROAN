@@ -4,8 +4,7 @@
 \alias{phenoRegressor.rrBLUP.SNP}
 \title{SNP-BLUP using rrBLUP library}
 \usage{
-phenoRegressor.rrBLUP.SNP(phenotypes, genotypes, extraCovariates = NULL,
-  ...)
+phenoRegressor.rrBLUP.SNP(phenotypes, genotypes, extraCovariates = NULL, ...)
 }
 \arguments{
 \item{phenotypes}{phenotypes, a numeric array (n x 1), missing values are predicted}

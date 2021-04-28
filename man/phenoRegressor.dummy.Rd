@@ -39,9 +39,10 @@ phenoRegressor.dummy(
 )
 }
 \seealso{
-Other phenoRegressors: \code{\link{phenoRegressor.BGLR}},
-  \code{\link{phenoRegressor.RFR}},
-  \code{\link{phenoRegressor.SVR}},
-  \code{\link{phenoRegressor.rrBLUP}}
+Other phenoRegressors: 
+\code{\link{phenoRegressor.BGLR}()},
+\code{\link{phenoRegressor.RFR}()},
+\code{\link{phenoRegressor.SVR}()},
+\code{\link{phenoRegressor.rrBLUP}()}
 }
 \concept{phenoRegressors}

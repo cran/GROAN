@@ -22,8 +22,9 @@ phenos = rnorm(10)
 all(phenos == noiseInjector.dummy(phenos)) #TRUE
 }
 \seealso{
-Other noiseInjectors: \code{\link{noiseInjector.norm}},
-  \code{\link{noiseInjector.swapper}},
-  \code{\link{noiseInjector.unif}}
+Other noiseInjectors: 
+\code{\link{noiseInjector.norm}()},
+\code{\link{noiseInjector.swapper}()},
+\code{\link{noiseInjector.unif}()}
 }
 \concept{noiseInjectors}

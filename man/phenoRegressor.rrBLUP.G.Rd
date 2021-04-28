@@ -4,8 +4,7 @@
 \alias{phenoRegressor.rrBLUP.G}
 \title{G-BLUP using rrBLUP library}
 \usage{
-phenoRegressor.rrBLUP.G(phenotypes, covariances, extraCovariates = NULL,
-  ...)
+phenoRegressor.rrBLUP.G(phenotypes, covariances, extraCovariates = NULL, ...)
 }
 \arguments{
 \item{phenotypes}{phenotypes, a numeric array (n x 1), missing values are predicted}

@@ -1,3 +1,6 @@
+Changes in 1.2.1:
+* added dependency to rmarkdown to comply to new knitr policy
+
 Changes in 1.2:
 * ridge regression BLUP now supports both SNP-BLUP and G-BLUP
 * plotResult function now has the option to select what to use as labels

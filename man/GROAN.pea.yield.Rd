@@ -4,7 +4,9 @@
 \name{GROAN.pea.yield}
 \alias{GROAN.pea.yield}
 \title{[DEPRECATED]}
-\format{A named array with 103 slots.}
+\format{
+A named array with 103 slots.
+}
 \source{
 Annicchiarico et al., \emph{GBS-Based Genomic Selection
 for Pea Grain Yield under Severe Terminal Drought}, The Plant Genome,
