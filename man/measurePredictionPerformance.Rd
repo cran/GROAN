@@ -19,6 +19,7 @@ A named array with the following fields:
  \item{rmse}{Root Mean Square Error}
  \item{mae}{Mean Absolute Error}
  \item{coeff_det}{Coefficient of determination}
+ \item{ndcg10, ndcg20, ndcg50, ndcg100}{mean Normalized Discounted Cumulative Gain with k equal to 0.1, 0.2, 0.5 and 1}
 }
 }
 \description{

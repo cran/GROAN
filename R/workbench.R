@@ -45,6 +45,8 @@
 #'                  nothing will be saved. Filenames are standardized. If existing,
 #'                  accuracy and hyperparameter files will be updated, otherwise are created. ExtraData
 #'                  cannot be updated, so unique filenames will be generated using runId (see \link{GROAN.run})
+#' @param outfile.name file name to be used to save the accuracies in a text file. Defaults to "accuracy.csv".
+#'                     Ignored if \code{outfolder} is \code{NULL}
 #' @param saveHyperParms boolean indicating if the hyperparameters from regressor training should be
 #'                       saved in \code{outfolder}. Defaults to FALSE.
 #' @param saveExtraData boolean indicating if extradata from regressor training should be
@@ -64,7 +66,7 @@
 #' @export
 createWorkbench = function (
   folds=10, reps=5, stratified=FALSE,
-  outfolder=NULL, saveHyperParms=FALSE, saveExtraData=FALSE,
+  outfolder=NULL, outfile.name = 'accuracy.csv', saveHyperParms=FALSE, saveExtraData=FALSE,
   regressor=phenoRegressor.rrBLUP,
   regressor.name = 'default regressor', ...){
 
@@ -98,6 +100,7 @@ createWorkbench = function (
     reps = reps,
     stratified = stratified,
     outfolder = outfolder,
+    outfile.name = outfile.name,
     saveHyperParms = saveHyperParms,
     saveExtraData = saveExtraData,
     regressor = list(regressor),
@@ -243,6 +246,30 @@ addRegressor = function(wb, regressor, regressor.name=regressor, ...){
   return(wb)
 }
 
+#' Function to calculate mean Normalized Discounted Cumulative Gain (NDCG)
+#'
+#' This function calculates NDCG from the vectors of observed
+#' and predicted values and the chosen proportion k of top
+#' observations (rank).
+#'
+#' @param y true values
+#' @param y_hat predicted values
+#' @param k relevant proportion of rank (top)
+#'
+#' @return a real value in [0,1]
+ndcg = function(y, y_hat, k=0.20) {
+
+  k = floor(k*length(y)) #choose the 10% of large emitter animals
+  y.sort_y = y[order(y,decreasing=TRUE)]
+  y.sort_y_hat = y[order(y_hat,decreasing=TRUE)]
+
+  d<-1/(log2(1:k+1))
+  temp = sum(y.sort_y_hat[1:k]*d)/sum(y.sort_y[1:k]*d)
+
+  return(temp)
+}
+
+
 #' Measure Performance of a Prediction
 #'
 #' This method returns several performance metrics for the passed
@@ -258,6 +285,7 @@ addRegressor = function(wb, regressor, regressor.name=regressor, ...){
 #'  \item{rmse}{Root Mean Square Error}
 #'  \item{mae}{Mean Absolute Error}
 #'  \item{coeff_det}{Coefficient of determination}
+#'  \item{ndcg10, ndcg20, ndcg50, ndcg100}{mean Normalized Discounted Cumulative Gain with k equal to 0.1, 0.2, 0.5 and 1}
 #' }
 #' @export
 measurePredictionPerformance = function(truevals, predvals){
@@ -265,18 +293,29 @@ measurePredictionPerformance = function(truevals, predvals){
   pea = cor(truevals, predvals, method = 'pearson')
   spe = cor(truevals, predvals, method = 'spearman')
 
-  #coeffiecient of determination
+  #coefficient of determination
   ss_tot = sum((truevals - mean(truevals))^2)
   ss_res = sum((truevals - predvals)^2)
   r_square = 1 - ss_res / ss_tot
 
   return(c(
+    #correlations
     pearson = pea,
     spearman = spe,
     cor_success = !is.na(pea),
+
+    #errors
     rmse = sqrt(mean((truevals - predvals)^2)),
     mae = mean(abs(truevals - predvals)),
-    coeff_det = r_square
+
+    #coefficient of determination
+    coeff_det = r_square,
+
+    #ndcg
+    ndcg10 = ndcg(y = truevals, y_hat = predvals, k = 0.10),
+    ndcg20 = ndcg(y = truevals, y_hat = predvals, k = 0.20),
+    ndcg50 = ndcg(y = truevals, y_hat = predvals, k = 0.50),
+    ndcg100 = ndcg(y = truevals, y_hat = predvals, k = 1)
   ))
 }
 

@@ -9,6 +9,7 @@ createWorkbench(
   reps = 5,
   stratified = FALSE,
   outfolder = NULL,
+  outfile.name = "accuracy.csv",
   saveHyperParms = FALSE,
   saveExtraData = FALSE,
   regressor = phenoRegressor.rrBLUP,
@@ -37,6 +38,9 @@ strata, even if present in the \link[=createNoisyDataset]{GROAN.NoisyDataSet}.}
 nothing will be saved. Filenames are standardized. If existing,
 accuracy and hyperparameter files will be updated, otherwise are created. ExtraData
 cannot be updated, so unique filenames will be generated using runId (see \link{GROAN.run})}
+
+\item{outfile.name}{file name to be used to save the accuracies in a text file. Defaults to "accuracy.csv".
+Ignored if \code{outfolder} is \code{NULL}}
 
 \item{saveHyperParms}{boolean indicating if the hyperparameters from regressor training should be
 saved in \code{outfolder}. Defaults to FALSE.}

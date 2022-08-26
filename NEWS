@@ -1,3 +1,10 @@
+Changes in 1.3:
+* added new metrics: NDCG10, NDCG20, NDCG50, NDCG100. This changes the accuracies save file columns count
+* now accepting fractional genotypes in Noisy Data Set objects (if explicitly allowed by the user)
+* added new function phenoregressor.BGLR.multikinships to implement Bayesian GBLUP using more than one kinship matrices
+* added option to set the accuracy file name (before it defaulted to "accuracy.csv")
+* expanded GROAN.run interface to report the list of tested regressors
+
 Changes in 1.2.1:
 * added dependency to rmarkdown to comply to new knitr policy
 

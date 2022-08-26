@@ -12,6 +12,7 @@ createNoisyDataset(
   strata = NULL,
   extraCovariates = NULL,
   ploidy = 2,
+  allowFractionalGenotypes = FALSE,
   noiseInjector = noiseInjector.dummy,
   ...
 )
@@ -39,6 +40,8 @@ Numeric ones will be normalized, string and categorical ones will be transformed
 in stub TRUE/FALSE variables (one per possible value, see \link[stats]{model.matrix}).}
 
 \item{ploidy}{number of haploid sets in the cell. Defaults to 2 (diploid).}
+
+\item{allowFractionalGenotypes}{if TRUE non-integer values for genotypes can be allowed. Defaults to FALSE}
 
 \item{noiseInjector}{name of a noise injector function, defaults to \link{noiseInjector.dummy}}
 

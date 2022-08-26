@@ -20,14 +20,14 @@ library(GROAN)
 ## ---- eval=TRUE, include=TRUE, echo=TRUE--------------------------------------
 #creating a GROAN.NoisyDataset without any extra noise injected
 nds.no_noise = createNoisyDataset(
-  name = 'PEA KI, no noise',
+  name = "PEA KI, no noise",
   genotypes = GROAN.KI$SNPs, 
   phenotypes = GROAN.KI$yield
 )
 
 #creating a GROAN.NoisyDataset adding noise sampled from a normal distribution
 nds.normal_noise = createNoisyDataset(
-  name = 'PEA KI, normal noise',
+  name = "PEA KI, normal noise",
   genotypes = GROAN.KI$SNPs, 
   phenotypes = GROAN.KI$yield,
   noiseInjector = noiseInjector.norm,
@@ -37,7 +37,7 @@ nds.normal_noise = createNoisyDataset(
 
 #creating a third dataset, this time with data from the AI lines
 nds.no_noise.AI = createNoisyDataset(
-  name = 'PEA AI, no noise',
+  name = "PEA AI, no noise",
   genotypes = GROAN.AI$SNPs, 
   phenotypes = GROAN.AI$yield
 )
@@ -45,11 +45,11 @@ nds.no_noise.AI = createNoisyDataset(
 
 ## ----eval=TRUE, echo=TRUE, fig.align="center", fig.height=5, fig.width=5, include=TRUE----
 #plotting the original phenotypes
-plot(GROAN.KI$yield, pch=20, main = 'True (black) vs. Noisy (red)', xlab = 'Samples', ylab = 'Phenotypes')
+plot(GROAN.KI$yield, pch=20, main = "True (black) vs. Noisy (red)", xlab = "Samples", ylab = "Phenotypes")
 #plotting an instance of the phenotypes with noise injected 
-points(getNoisyPhenotype(nds.normal_noise), col='red')
+points(getNoisyPhenotype(nds.normal_noise), col="red")
 
-## ----eval=TRUE, include=TRUE, echo=TRUE, , results='hold'---------------------
+## ----eval=TRUE, include=TRUE, echo=TRUE, , results="hold"---------------------
 #average correlation oscillates around 0.89
 cor(GROAN.KI$yield, getNoisyPhenotype(nds.normal_noise))
 cor(GROAN.KI$yield, getNoisyPhenotype(nds.normal_noise))
@@ -77,7 +77,7 @@ wb = createWorkbench(
   outfolder = NULL, saveHyperParms = FALSE, saveExtraData = FALSE,
   
   #a regressor
-  regressor = phenoRegressor.rrBLUP, regressor.name = 'rrBLUP'
+  regressor = phenoRegressor.rrBLUP, regressor.name = "rrBLUP"
 )
 
 ## ---- eval=TRUE, include=TRUE, echo=TRUE--------------------------------------
@@ -86,10 +86,10 @@ wb = addRegressor(
   #the Workbench to be updater
   wb,
   #the new regressor
-  regressor = phenoRegressor.BGLR, regressor.name = 'Bayesian Lasso',
+  regressor = phenoRegressor.BGLR, regressor.name = "Bayesian Lasso",
   
   #regressor-specific parameters
-  type = 'BL'
+  type = "BL"
 )
 
 ## ---- eval=TRUE, include=TRUE, echo=TRUE--------------------------------------
@@ -109,31 +109,31 @@ print(wb)
 #  print(p)
 
 ## ---- out.width = "600px", eval=TRUE, include=TRUE, echo=FALSE----------------
-knitr::include_graphics('plot1.png')
+knitr::include_graphics("plot1.png")
 
 ## ---- eval=FALSE, include=TRUE, echo=TRUE-------------------------------------
 #  #a barplot with 95% confidence interval of Pearson's correlations
-#  p = plotResult(res.total, plot.type = 'bar_conf95')
+#  p = plotResult(res.total, plot.type = "bar_conf95")
 #  print(p)
 
 ## ---- out.width = "600px", eval=TRUE, include=TRUE, echo=FALSE----------------
-knitr::include_graphics('plot2.png')
+knitr::include_graphics("plot2.png")
 
 ## ---- eval=FALSE, include=TRUE, echo=TRUE-------------------------------------
 #  #a barplot of execution times per fold, in seconds
-#  p = plotResult(res.total, plot.type = 'bar', variable = 'time')
+#  p = plotResult(res.total, plot.type = "bar", variable = "time")
 #  print(p)
 
 ## ---- out.width = "600px", eval=TRUE, include=TRUE, echo=FALSE----------------
-knitr::include_graphics('plot3.png')
+knitr::include_graphics("plot3.png")
 
 ## ---- eval=FALSE, include=TRUE, echo=TRUE-------------------------------------
 #  #collating the two example datasets
 #  nds.double = createNoisyDataset(
-#    name = 'KI and AI',
+#    name = "KI and AI",
 #    genotypes = rbind(GROAN.KI$SNPs, GROAN.AI$SNPs),
 #    phenotypes = c(GROAN.KI$yield, GROAN.AI$yield),
-#    strata = c(rep('KI', 103), rep('AI', ,105)) #we have 103 KI and 105 AI
+#    strata = c(rep("KI", 103), rep("AI", ,105)) #we have 103 KI and 105 AI
 #  )
 #  
 #  #the workbench will take into account strata
@@ -141,32 +141,32 @@ knitr::include_graphics('plot3.png')
 #  
 #  #ready to go
 #  res = GROAN.run(nds.double, wb)
-#  plotResult(res, strata = 'single', plot.type = 'bar')
+#  plotResult(res, strata = "single", plot.type = "bar")
 
 ## ---- out.width = "600px", eval=TRUE, include=TRUE, echo=FALSE----------------
-knitr::include_graphics('plot4.png')
+knitr::include_graphics("plot4.png")
 
 ## ---- eval=FALSE, include=TRUE, echo=TRUE-------------------------------------
 #  #a new GROAN.Workbench with NO crossvalidation and only one repetition
 #  wb = createWorkbench(
 #    folds = NULL, reps = 1,
-#    regressor.name = 'rrBLUP', regressor = phenoRegressor.rrBLUP)
+#    regressor.name = "rrBLUP", regressor = phenoRegressor.rrBLUP)
 #  
 #  #training on PEA.KI, testing on PEA.AI
 #  res = GROAN.run(nds = nds.normal_noise, wb = wb, nds.test = nds.no_noise.AI)
 #  
-#  print(res[,c('dataset.train', 'dataset.test', 'pearson')])
+#  print(res[,c("dataset.train", "dataset.test", "pearson")])
 
 ## ---- eval=FALSE, include=TRUE, echo=TRUE-------------------------------------
 #  #a new GROAN.Workbench with 5-fold crossvalidation and only one repetition
 #  wb = createWorkbench(
 #    folds = 5, reps = 1,
-#    regressor.name = 'rrBLUP', regressor = phenoRegressor.rrBLUP)
+#    regressor.name = "rrBLUP", regressor = phenoRegressor.rrBLUP)
 #  
 #  #training on PEA.KI, testing on PEA.KI (crossvalidation) and PEA.AI
 #  res = GROAN.run(nds = nds.normal_noise, wb = wb, nds.test = nds.no_noise.AI)
 #  
-#  print(res[,c('dataset.train', 'dataset.test', 'pearson')])
+#  print(res[,c("dataset.train", "dataset.test", "pearson")])
 
 ## ---- eval=FALSE, include=TRUE, echo=TRUE-------------------------------------
 #  #training on PEA.KI, testing on PEA.KI (crossvalidation), PEA.AI, and PEA.KI again (overfitting!)
@@ -175,7 +175,7 @@ knitr::include_graphics('plot4.png')
 #    nds.test = list(nds.no_noise.AI, nds.no_noise)
 #    )
 #  
-#  print(res[,c('dataset.train', 'dataset.test', 'pearson')])
+#  print(res[,c("dataset.train", "dataset.test", "pearson")])
 
 ## ----eval=TRUE, echo=TRUE, fig.align="center", fig.height=5, fig.width=5, include=TRUE----
   #GROAN.KI has 103 samples, we'll use the first 50 samples for training
@@ -191,8 +191,8 @@ knitr::include_graphics('plot4.png')
   
   #visualize the predictions
   plot(
-    x = GROAN.KI$yield[51:103], xlab = 'Real values', 
-    y = res$predictions[51:103], ylab = 'Predicted values'
+    x = GROAN.KI$yield[51:103], xlab = "Real values", 
+    y = res$predictions[51:103], ylab = "Predicted values"
   )
   abline(a=0, b=1) #adding first quadrant bisector, for reference
 
@@ -212,7 +212,7 @@ knitr::include_graphics('plot4.png')
 ## ---- eval=FALSE, include=TRUE, echo=TRUE-------------------------------------
 #  #A GROAN.NoisyDataSet that embeds the bias noise
 #  nds.bias_noise = createNoisyDataset(
-#    name = 'PEA, bias noise',
+#    name = "PEA, bias noise",
 #    genotypes = GROAN.KI$SNPs,
 #    phenotypes = GROAN.KI$yield,
 #    noiseInjector = my.noiseInjector.bias   #the function we defined above
@@ -234,7 +234,7 @@ knitr::include_graphics('plot4.png')
 ## ---- eval=FALSE, include=TRUE, echo=TRUE-------------------------------------
 #  #A NoisyDataSet with bias noise function, using the second version of the function
 #  nds.bias_noise2 = createNoisyDataset(
-#    name = 'PEA, bias noise, second function',
+#    name = "PEA, bias noise, second function",
 #    genotypes = GROAN.KI$SNPs,
 #    phenotypes = GROAN.KI$yield,
 #    noiseInjector = my.noiseInjector.bias2,   #the new version
@@ -246,8 +246,8 @@ knitr::include_graphics('plot4.png')
 #    #no operation is actually required
 #    return(list(
 #      predictions = runif(length(phenotypes)), #predictions
-#      hyperparams = c(some = 1, params='a'),
-#      extradata = 'filler extra data for phenoRegressor.dummy'
+#      hyperparams = c(some = 1, params="a"),
+#      extradata = "filler extra data for phenoRegressor.dummy"
 #    ))
 #  }
 

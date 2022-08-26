@@ -212,6 +212,145 @@ phenoRegressor.BGLR = function (phenotypes, genotypes, covariances, extraCovaria
   ))
 }
 
+
+#' Multi-matrix GBLUP using BGLR
+#'
+#' This regressor implements Genomic BLUP using Bayesian methods from \link[BGLR]{BGLR} package,
+#' but allows to use more than one covariance matrix.
+#'
+#' In its simplest form, GBLUP is defined as:
+#' \deqn{y = 1\mu + Z u + e}
+#' with
+#' \deqn{var(y) =  K \sigma_u^2 + I\sigma_e^2}
+#'
+#' Where \eqn{\mu} is the overall mean, \eqn{K} is the incidence matrix
+#' relating individual weights \eqn{u} to \eqn{y}, and \eqn{e} is a
+#' vector of residuals with zero mean and covariance matrix \eqn{I\sigma_e^2}
+#'
+#' It is possible to extend the above model to include different types of
+#' kinship matrices, each capturing different links between genotypes and phenotypes:
+#'
+#' \deqn{y = 1\mu + Z1 u1 + Z2 u2 + \dots + e}
+#' with
+#' \deqn{var(y) =  K1 \sigma_u1^2 + K2 \sigma_u2^2 + \dots + I\sigma_e^2}
+#'
+#' This function receives the first kinship matrix \eqn{K1} via the \code{covariances}
+#' argument and an arbitrary number of extra matrices via the \code{extraCovariates}
+#' built as follow:
+#'
+#'  \preformatted{#given the following defined variables
+#'y = <some values, Nx1 array>
+#'K1 = <NxN kinship matrix>
+#'K2 = <another NxN kinship matrix>
+#'K3 = <a third NxN kinship matrix>
+#'
+#'#invoking the multi kinship GBLUP
+#'y_hat = phenoregressor.BGLR.multikinships(
+#'   phenotypes = y,
+#'   covariances = K1,
+#'   extraCovariates = cbind(K2, K3)
+#')
+#' }
+#'
+#' @param phenotypes phenotypes, a numeric array (n x 1), missing values are predicted
+#' @param genotypes added for compatibility with the other GROAN regressors, must be NULL
+#' @param covariances square matrix (n x n) of covariances.
+#' @param extraCovariates the extra covariance matrices to be added in the GBLUP model,
+#'                        collated in a single matrix-like structure, with optionally first column
+#'                        as an ignored intercept (supported for compatibility). See details, below.
+#' @param type character literal, one of the following: FIXED (Flat prior), BRR (Gaussian prior),
+#'             BL (Double-Exponential prior), BayesA (scaled-t prior),
+#'             BayesB (two component mixture prior with a point of mass at zero and a scaled-t slab),
+#'             BayesC (two component mixture prior with a point of mass at zero and a Gaussian slab),
+#'             RKHS (Gaussian processes, default)
+#' @param ... extra parameters are passed to \code{\link[BGLR]{BGLR}}
+#'
+#' @return The function returns a list with the following fields:
+#' \itemize{
+#'   \item \code{predictions} : an array of (n) predicted phenotypes, with NAs filled and all other positions repredicted (useful for calculating residuals)
+#'   \item \code{hyperparams} : empty, returned for compatibility
+#'   \item \code{extradata}   : list with information on trained model, coming from \code{\link[BGLR]{BGLR}}
+#' }
+#' @family phenoRegressors
+#' @seealso \link[BGLR]{BGLR}
+#' @export
+phenoregressor.BGLR.multikinships = function(phenotypes, genotypes = NULL, covariances, extraCovariates, type = 'RKHS', ...){
+  #is BGLR installed?
+  if (!requireNamespace("BGLR", quietly = TRUE)) {
+    stop("BGLR package needed for this regressor to work. Please install it.",
+         call. = FALSE)
+  }
+
+  #checking that the user knows what they are doing
+  if(!is.null(genotypes)){
+    stop('genotypes should be NULL, this is a kinship-only regressor')
+  }
+
+  #preparing the list to call the BGLR
+  BGLR.args = list(...)
+  BGLR.args$y = phenotypes
+
+  #always using RKHS
+  BGLR.args$ETA = list()
+  covariances = as.matrix(covariances)
+  BGLR.args$ETA[[1]] = list(K=covariances, model=type)
+
+  #do we have extra covariates?
+  if (!is.null(extraCovariates)){
+    n = length(phenotypes)
+    columns = ncol(extraCovariates) #this should be in the form (n x m + 1) or (n x m)
+    remainder = columns %% n
+    if(remainder > 1){
+      stop('Extracovariates should be a matrix sized [n x nm] or [n x (nm+1)] where n is
+      the number of samples and m is the number of extra kinship matrices to be
+      included in the model other than the one passed via covariances parameter.
+      In case of [n x (nm+1)] the first column is considered intecept and ignored.')
+    }
+    extraCovariates = as.matrix(extraCovariates)
+
+    #do extracovariates have an intercept as first column?
+    if (remainder == 1){
+      extraCovariates = extraCovariates[,-1]
+    }
+
+    #at this point we can compute the actual number of extra matrices
+    m = ncol(extraCovariates) / n
+
+    #each block of square matrix becomes a different entry in BGLR's ETA
+    for (curr in 0:(m-1)){
+      from = 1 + curr * n
+      to = from + n - 1
+      BGLR.args$ETA[[2 + curr]] = list(K=as.matrix(extraCovariates[,from:to]), model=type)
+    }
+  }
+
+  #since there is no way to NOT save the progress files
+  #we create a tmpdir and then delete it at the end
+  tmpdir = tempfile()
+  dir.create(tmpdir, showWarnings = FALSE, recursive = TRUE)
+  BGLR.args$saveAt = tmpdir
+
+  #we should run with verbose=FALSE, but the user takes
+  #precedence
+  if (is.null(BGLR.args$verbose)){
+    BGLR.args$verbose = FALSE
+  }
+
+  #ready to run
+  trained.model = do.call(BGLR::BGLR, args = BGLR.args)
+
+  #delete tempdir
+  unlink(tmpdir, recursive = TRUE)
+
+  #creating the result list
+  return(list(
+    predictions = trained.model$yHat,
+    hyperparams = c(Note = 'No hyperparameters saved from BGLR, please see extra data'),
+    extradata = trained.model
+  ))
+}
+
+
 #' SNP-BLUP or G-BLUP using rrBLUP package
 #'
 #' This is a wrapper around \code{rrBLUP} function \code{\link[rrBLUP]{mixed.solve}}.

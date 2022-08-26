@@ -183,6 +183,7 @@ Other phenoRegressors:
 \code{\link{phenoRegressor.BGLR}()},
 \code{\link{phenoRegressor.RFR}()},
 \code{\link{phenoRegressor.dummy}()},
-\code{\link{phenoRegressor.rrBLUP}()}
+\code{\link{phenoRegressor.rrBLUP}()},
+\code{\link{phenoregressor.BGLR.multikinships}()}
 }
 \concept{phenoRegressors}

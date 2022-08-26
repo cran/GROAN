@@ -114,7 +114,7 @@ GROAN.run = function(nds, wb, nds.test = NULL, run.id = createRunId()){
     #let's be sure there is room for saving files
     dir.create(wb$outfolder, showWarnings = FALSE, recursive = TRUE)
     #accuracy output file name
-    accuracy.filename = file.path(wb$outfolder, 'accuracy.csv')
+    accuracy.filename = file.path(wb$outfolder, wb$outfile.name)
     #flag to mark if output file already exists (and to trigger append)
     accuracy.append = file.exists(accuracy.filename)
   }
@@ -146,6 +146,9 @@ GROAN.run = function(nds, wb, nds.test = NULL, run.id = createRunId()){
   }
   datasets = paste(collapse = ', ', datasets)
   msg = paste(msg, datasets)
+  msg.all = c(msg.all, msg)
+
+  msg = paste(' - testing regressors(s):', paste(collapse = ', ', r.names))
   msg.all = c(msg.all, msg)
 
   writeLines(msg.all)

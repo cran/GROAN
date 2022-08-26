@@ -94,6 +94,7 @@ Other phenoRegressors:
 \code{\link{phenoRegressor.BGLR}()},
 \code{\link{phenoRegressor.RFR}()},
 \code{\link{phenoRegressor.SVR}()},
-\code{\link{phenoRegressor.dummy}()}
+\code{\link{phenoRegressor.dummy}()},
+\code{\link{phenoregressor.BGLR.multikinships}()}
 }
 \concept{phenoRegressors}

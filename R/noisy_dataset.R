@@ -41,6 +41,7 @@
 #'                        Numeric ones will be normalized, string and categorical ones will be transformed
 #'                        in stub TRUE/FALSE variables (one per possible value, see \link[stats]{model.matrix}).
 #' @param ploidy number of haploid sets in the cell. Defaults to 2 (diploid).
+#' @param allowFractionalGenotypes if TRUE non-integer values for genotypes can be allowed. Defaults to FALSE
 #' @param noiseInjector name of a noise injector function, defaults to \link{noiseInjector.dummy}
 #' @param ... further arguments are passed along to noiseInjector
 #'
@@ -58,12 +59,12 @@
 #'   mean = 0,
 #'   sd = sd(GROAN.KI$yield) * 0.5
 #' )
-createNoisyDataset = function (name, genotypes=NULL, covariance=NULL, phenotypes, strata=NULL, extraCovariates=NULL, ploidy=2, noiseInjector=noiseInjector.dummy, ...){
+createNoisyDataset = function (name, genotypes=NULL, covariance=NULL, phenotypes, strata=NULL, extraCovariates=NULL, ploidy=2, allowFractionalGenotypes=FALSE, noiseInjector=noiseInjector.dummy, ...){
   #checking inputs
   check.name(name)
   check.ploidy(ploidy)
   check.phenotypes(phenotypes)
-  check.genetic_data(genotypes, covariance, n=length(phenotypes), ploidy=ploidy)
+  check.genetic_data(genotypes, covariance, n=length(phenotypes), ploidy=ploidy, allowFractionalGenotypes=allowFractionalGenotypes)
   check.strata(strata, n=length(phenotypes))
   check.extraCovariates(extraCovariates, n=length(phenotypes))
   check.noiseInjector(noiseInjector)
@@ -167,12 +168,12 @@ check.extraCovariates = function(extraCovariates, n){
 
 #checks that at least one of genotypes and covariance is not NULL
 #calls the proper further checks on the available data
-check.genetic_data = function(genotypes, covariance, n, ploidy){
+check.genetic_data = function(genotypes, covariance, n, ploidy, allowFractionalGenotypes){
   if (all(is.null(genotypes), is.null(covariance))){
     stop(paste('At least one among genotypes and covariance matrix need to be not NULL'), call. = FALSE)
   }
   if (!is.null(genotypes)){
-    check.genotypes(genotypes, n, ploidy)
+    check.genotypes(genotypes, n, ploidy, allowFractionalGenotypes)
   }
   if (!is.null(covariance)){
     check.covariance(covariance, n)
@@ -182,10 +183,10 @@ check.genetic_data = function(genotypes, covariance, n, ploidy){
 #check genotypes are a matrix/df in the form
 #-n rows (where n is the number of samples)
 #-one column per locus
-#-values in 0/1/2/...ploidy
+#-values in 0/1/2/...ploidy unless allowFractionalGenotypes==TRUE (in which case the [0..ploidy] range is allowed)
 #-no missings
 #fails if any condition is not met
-check.genotypes = function(genotypes, n, ploidy){
+check.genotypes = function(genotypes, n, ploidy, allowFractionalGenotypes){
   #dimensional check
   if (nrow(genotypes) != n){
     stop(paste('Passed genotypes should have as many rows as phenotypes slots.'), call. = FALSE)
@@ -199,18 +200,17 @@ check.genotypes = function(genotypes, n, ploidy){
   #for numeric check we need a matrix
   genotypes.max = as.matrix(genotypes)
 
-  #The following checks were removed to allow experimenting
-  #with kinship values as genotypes. Please reactivate it
-  #once kinship has proper support
+  #are we in the allowed range?
+  if(min(genotypes.max) < 0){
+    stop(paste('Passed genotypes contains negative values'), call. = FALSE)
+  }
+  if(max(genotypes.max) > ploidy){
+    stop(paste('Passed genotypes contains values greater than the ploidy'), call. = FALSE)
+  }
 
-  #are all valid integer values?
-    if(!all(is.naturalnumber(genotypes.max, -1))){
-      stop(paste('Passed genotypes contains non integer or negative values.'), call. = FALSE)
-    }
-
-  #are all in the ploidy range?
-  if(max(genotypes.max > ploidy)){
-   stop(paste('Passed genotypes contains value(s) greater than ploidy.'), call. = FALSE)
+  #unless explicitly allowed, we should check for having only integer numbers
+  if(!allowFractionalGenotypes & !all(is.naturalnumber(genotypes.max, -1))){
+    stop("Passed genotypes contains non integer values (if it's expected consider setting allowFractionalGenotypes=TRUE)", call. = FALSE)
   }
 }
 
