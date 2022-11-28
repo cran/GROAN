@@ -31,7 +31,7 @@ library(GROAN)
 GROAN package allows to assess the performances of one or more genomic regressors
 when artificial noise is injected in an existing dataset. It is possible, however, 
 to use GROAN to simply compare the prediction accuracy of different regression 
-models without the injection of extra noise. Tests can either be perfomed on a single dataset (through crossvalidation) or multiple datasets (one for training, and one or more for testing). Crossvalidation and data management are transparent and the user is only required high level input.
+models without the injection of extra noise. Tests can either be performed on a single dataset (through crossvalidation) or multiple datasets (one for training, and one or more for testing). Crossvalidation and data management are transparent and the user is only required high level input.
 
 The general workflow is the following:
 
@@ -55,7 +55,7 @@ If you want to customize the type of injected noise you need to write a noise in
 as detailed [here](#custom_noise_injector).
 
 ## Example data
-In the rest of this document we refer to GROAN.KI and GROAN.AI, two dataset indluded in the package. 
+In the rest of this document we refer to GROAN.KI and GROAN.AI, two dataset included in the package. 
 GROAN.KI and GROAN.AI contain data of 103 and 105 pea lines, respectively. The pea samples were
 genotyped for 647 SNPs coming from genotyping-by-sequencing (GBS). The datasets contain also a single phenotypic trait (grain yield, measured in t/ha). The datasets come in the form of two list, each one containing the following fields:
 
@@ -119,7 +119,7 @@ plot(GROAN.KI$yield, pch=20, main = "True (black) vs. Noisy (red)", xlab = "Samp
 points(getNoisyPhenotype(nds.normal_noise), col="red")
 ```
 
-Noise injectors usually leverage a stochastic mechanism to add noise. Therefore, successive calls to __getNoisyPhenotype__ produce (slighly) different results.
+Noise injectors usually leverage a stochastic mechanism to add noise. Therefore, successive calls to __getNoisyPhenotype__ produce (slightly) different results.
 
 ```{r eval=TRUE, include=TRUE, echo=TRUE, , results="hold"}
 #average correlation oscillates around 0.89
@@ -224,7 +224,7 @@ phenoRegressor.BGLR   | Regressors from [BGLR](https://cran.r-project.org/packag
 phenoRegressor.dummy  | A dummy function returning random values, for test/development purposes.
 phenoRegressor.RFR    | Random forest regression from package [randomForest](https://cran.r-project.org/package=randomForest) (caution: very slow)
 phenoRegressor.rrBLUP | Regressor from [rrBLUP](https://cran.r-project.org/package=rrBLUP) package, implements SNP blup with ridge-regression-like solution
-phenoRegressor.SVR    | Support Vector Regression from package [e1071](https://cran.r-project.org/package=e1071). It can operate in three modes: a) _no training_ (an existing SVR object is needed), b) _training_ (when hyperparameters are known) and c) _tuning_ (when hyperpareters need to be optimized in a grid search, very slow)
+phenoRegressor.SVR    | Support Vector Regression from package [e1071](https://cran.r-project.org/package=e1071). It can operate in three modes: a) _no training_ (an existing SVR object is needed), b) _training_ (when hyperparameters are known) and c) _tuning_ (when hyperparameters need to be optimized in a grid search, very slow)
 
 It is possible to extend GROAN functionalities by writing your own
 regressor, as detailed [here](#custom_regressor)
@@ -248,7 +248,7 @@ res.normal_noise = GROAN.run(nds.normal_noise, wb)
 res.total = rbind(res.no_noise, res.normal_noise)
 ```
 
-The returned GROAN.Result has both a _print_ and a summary _method_, but for quick inspection it's possible to use the __plotResult__ function. The function leverages the [ggplot2](https://cran.r-project.org/package=ggplot2) package and returns a ggplot object. It is possible to select the performance meausure to be plotted, together with the type of plot.
+The returned GROAN.Result has both a _print_ and a summary _method_, but for quick inspection it's possible to use the __plotResult__ function. The function leverages the [ggplot2](https://cran.r-project.org/package=ggplot2) package and returns a ggplot object. It is possible to select the performance measure to be plotted, together with the type of plot.
 
 ```{r, eval=FALSE, include=TRUE, echo=TRUE}
 #defaults is a boxplot of Pearson's correlations
@@ -374,7 +374,7 @@ Mode                   | How                   | What
 ---------------------- | --------------------- | ----------------------------------
 Don't save anything	   | outfolder=NULL        | Nothing will be saved on hard disk.
 Save summary	         | outfolder='some/path' | A subfolder will be created in the passed path, named after the run.id, containing an "accuracy.csv" file.
-...and hyperparameters | outfolder='some/path'<br>saveHyperParms=TRUE | Same as above, but save also hyperpameters from regressor tuning in csv format.
+...and hyperparameters | outfolder='some/path'<br>saveHyperParms=TRUE | Same as above, but save also hyperparameters from regressor tuning in csv format.
 ...and extra data      | outfolder='some/path'<br>saveExtraData=TRUE  | Same as above, but save also extra data from regressor tuning in R format.
 
 Hyperparameters are (usually numeric) values tuned during training phase. Not all regressors require hyperparameter tuning, and the exact nature of hyperparameters depends on the regressor.

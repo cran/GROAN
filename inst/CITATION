@@ -1,0 +1,17 @@
+citHeader("To cite GROAN in publications, please use:")
+
+bibentry(
+  bibtype = "Article",
+  title = "Stacked kinship CNN vs. GBLUP for genomic predictions of additive and complex continuous phenotypes",
+  author = c(
+    person("Nelson", "Nazzicari", role = c("cre", "aut"), email = 'nelson.nazzicari@crea.gov.it'),
+    person("Filippo", "Biscarini", role = c("aut"))
+  ),
+  journal = "Scientific Reports",
+  publisher = "Nature Publishing Group",
+  year = "2022",
+  volume = "12.1",
+  pages = "1--15",
+  doi = "10.1038/s41598-022-24405-0",
+  textVersion = 'Nazzicari Nelson & Filippo Biscarini. "Stacked kinship CNN vs. GBLUP for genomic predictions of additive and complex continuous phenotypes." Scientific Reports 12.1 (2022): 1-15.'
+)
